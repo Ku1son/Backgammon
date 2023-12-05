@@ -5,194 +5,251 @@
 using namespace std;
 
 #define SZEROKOSC 60
-#define DLUGOSC 14
+#define WYSOKOSC 15
 
-int wynikRzutu = 1;
-
-struct Gracz {
-    char symbol;
-    int bazaX[5]; // Tablica pól, na których znajdują się pionki gracza
-    int bazaY[5]; // Tablica wysokości pionków gracza
-    int liczbaPionkow; // Liczba pionków gracza
+struct Gracz
+{
+    int pionki[24]; // Tablica p�l, na kt�rych znajduj� si� pionki gracza
+    int dwor; // Tablica wysoko�ci pionk�w gracza
+    int zbite; // Liczba pionk�w gracza
+    bool kierunekDodatni;
+    bool czyZbite()
+    {
+        if(zbite>0)
+            return true;
+        return false;
+    }
+    bool kompletDom()
+    {
+        if(zbite>0)
+            return false;
+        for(int i=0; i<18; i++)
+        {
+            if(pionki[i]!=0)
+                return false;
+        }
+        return true;
+    }
 };
 
-Gracz graczO = {'O', {12, 12, 12, 12, 12}, {6, 7, 8, 9, 10}, 5};
-Gracz graczX = {'X', {12, 12, 12, 12, 12}, {13, 12, 11, 10, 9}, 5};
-
-void wyswietlPlansze() {
-    system("cls");
-
-     for (int i=0; i<SZEROKOSC; i++)
-    {
-        gotoxy(10+i, 5);
-        cputs("=");
-    }
-    for (int i=0; i<SZEROKOSC; i++)
-    {
-        gotoxy(10+i, 18);
-        cputs("=");
-    }
-    for (int i=0; i<DLUGOSC; i++)
-    {
-        gotoxy(10, 5+i);
-        cputs(":");
-    }
-    for (int i=0; i<DLUGOSC; i++)
-    {
-        gotoxy(70, 5+i);
-        cputs(":");
-    }
-    for (int i=0; i<DLUGOSC; i++)
-    {
-        gotoxy(40, 5+i);
-        cputs(":");
-    }
-    for (int i=13; i<=24; i++)
-    {
-        gotoxy((12+(i-13) * 5), 4);
-        cout << i ;
-    }
-    for (int i = 12; i >= 1; --i)
-    {
-        gotoxy((12 + (12 - i) * 5), 19);
-        cout << i ;
-    }
-    for (int i=0; i<5; i++)
-    {
-        gotoxy (12, 6+i);
-        cputs("O");
-    }
-    for (int i=0; i<3; i++)
-    {
-        gotoxy (32, 15+i);
-        cputs("O");
-    }
-    for (int i=0; i<5; i++)
-    {
-        gotoxy (42, 13+i);
-        cputs("O");
-    }
-    for (int i=0; i<2; i++)
-    {
-        gotoxy (67, 6+i);
-        cputs("O");
-    }
-    for (int i=0; i<5; i++)
-    {
-        gotoxy (12, 13+i);
-        cputs("X");
-    }
-    for (int i=0; i<3; i++)
-    {
-        gotoxy (32, 6+i);
-        cputs("X");
-    }
-    for (int i=0; i<5; i++)
-    {
-        gotoxy (42, 6+i);
-        cputs("X");
-    }
-    for (int i=0; i<2; i++)
-    {
-        gotoxy (67, 16+i);
-        cputs("X");
-    }
-
-
-    // Przykładowe użycie gotoxy:
-    gotoxy(graczO.bazaX[0], graczO.bazaY[0]);
-    cout << graczO.symbol;
-
-    gotoxy(graczX.bazaX[0], graczX.bazaY[0]);
-    cout << graczX.symbol;
+void nowaGra(Gracz *gracz1, Gracz *gracz2)
+{
+    *gracz1 = {{2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0}, 0, 0, true};
+    *gracz2 = {{0,0,0,0,0,5,0,3,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,2}, 0, 0, false};
 }
 
-int rzutKostkami() {
+int rzutKostkami()
+{
     srand(time(NULL));
     int losowyNumer = rand() % 6 + 1;
     return losowyNumer;
 }
 
-bool czyPoleJestWolne(int x, int y) {
-    // Sprawdza, czy pole na planszy jest wolne
-    // Możesz dodać odpowiednie warunki w zależności od logiki gry
-    return true;
+void rysujObramowanie()
+{
+    for (int i=0; i<SZEROKOSC; i++)
+    {
+        for (int j=5; j<=19; j+=7)
+        {
+            gotoxy(10+i, j);
+            if(j==12)
+                cputs("-");
+            else
+                cputs("=");
+        }
+    }
+    for (int i=0; i<WYSOKOSC; i++)
+    {
+        for (int j=10; j<=70; j+=30)
+        {
+            gotoxy(j, 5+i);
+            cputs(":");
+        }
+    }
+    for (int i=13; i<=24; i++)
+    {
+        gotoxy((12 + (i-13) * 5), 4);
+        cout << i ;
+    }
+    for (int i = 12; i >= 1; --i)
+    {
+        gotoxy((12 + (12 - i) * 5), 20);
+        cout << i ;
+    }
 }
 
-void ruchPionkiem(Gracz &gracz, int liczbaPol) {
-    for (int i = 0; i < gracz.liczbaPionkow; i++) {
-        int nowePoleX = gracz.bazaX[i] + liczbaPol;
-        int nowePoleY = gracz.bazaY[i];
-
-        // Sprawdza, czy na nowym polu nie ma kolizji z innym pionkiem
-        if (czyPoleJestWolne(nowePoleX, nowePoleY)) {
-            // Usuń pionek z aktualnej pozycji
-            gotoxy(gracz.bazaX[i], gracz.bazaY[i]);
-            cout << " ";
-
-            // Przesuń pionek o określoną liczbę pól
-            gracz.bazaX[i] = nowePoleX;
-            gracz.bazaY[i] = nowePoleY;
-
-            // Narysuj pionek na nowej pozycji
-            gotoxy(gracz.bazaX[i], gracz.bazaY[i]);
-            cout << gracz.symbol;
+void rysujPionki(Gracz *gracz1, Gracz *gracz2)
+{
+    for(int i=0; i<12; i++)
+    {
+        //g�rna cz�� planszy
+        if(gracz1->pionki[12+i]>0)
+        {
+            for(int j=0; j<gracz1->pionki[12+i]; j++)
+            {
+                gotoxy(12+5*i, 6+j);
+                cputs("()");
+            }
+        }
+        if(gracz2->pionki[12+i]>0)
+        {
+            for(int j=0; j<gracz2->pionki[12+i]; j++)
+            {
+                gotoxy(12+5*i, 6+j);
+                cputs("{}");
+            }
+        }
+        //dolna cz�� planszy
+        if(gracz1->pionki[11-i]>0)
+        {
+            for(int j=0; j<gracz1->pionki[11-i]; j++)
+            {
+                gotoxy(12+5*i, 18-j);
+                cputs("()");
+            }
+        }
+        if(gracz2->pionki[11-i]>0)
+        {
+            for(int j=0; j<gracz2->pionki[11-i]; j++)
+            {
+                gotoxy(12+5*i, 18-j);
+                cputs("{}");
+            }
         }
     }
 }
 
-int wybierzPole() {
+void wyswietlPlansze(Gracz *gracz1, Gracz *gracz2)
+{
+    system("cls");
+    rysujObramowanie();
+    rysujPionki(gracz1, gracz2);
+}
+
+int wybierzPole()
+{
     int pole;
     gotoxy(80, 2);
+    cout << "W celu zapisania gry";
+    gotoxy(80, 3);
+    cout << "i wyjscia wybierz 0.";
+    gotoxy(80, 4);
     cout << "Wybierz pole (1-24): ";
     cin >> pole;
     return pole;
 }
 
+int gra(bool nowa)
+{
+    Gracz gracz1, gracz2;
+    bool ruchGracza1 = true;
+    if(nowa)
+    {
+        nowaGra(&gracz1, &gracz2);
+    }
+    while (true)
+    {
+        wyswietlPlansze(&gracz1, &gracz2);
 
+        gotoxy(10, 2);
+        cout << "Tura gracza: ";
+        if(ruchGracza1)
+        {
+            cout << "(), w kierunku pola 24";
+        }
+        else
+        {
+            cout << "{}, w kierunku pola 1";
+        }
+        // Rzut kostk� i wy�wietlenie wyniku
+        int kostka1 = rzutKostkami();
+        int kostka2 = rzutKostkami();
+        gotoxy(80, 6);
+        cout << "Wynik rzutu kostkami: " << kostka1 << "  " << kostka2;
 
-bool czyKoniecGry() {
-    // Implementuj logikę sprawdzającą warunki końca gry
-    // Na przykład, gdy jeden z graczy osiągnie określoną pozycję na planszy
-    return (graczO.bazaX[0] >= 24 || graczX.bazaX[0] <= 1);
+        // Wyb�r pola i ruch pionkiem dla gracza O
+        int wybor = wybierzPole();
+        if(wybor == 0)
+        {
+            //TODO zapis
+        }
+        else
+        {
+            //TODO gra
+        }
+    }
 }
 
-int main() {
-    // Inicjalizacja biblioteki conio2
+int menu(int *stan)
+{
+    char* menu[] = {"Nowa gra", "Wczytaj gre", "Statystyki", "Wyjscie"};
+    int n = 4;
+    char strzalka;
+
+    while(true)
+    {
+        clrscr();
+        gotoxy(1,1);
+
+        cout<<"Szymon Kula nr. \n \n";
+        for(int i=0; i<n; i++)
+        {
+            if(i == *stan)
+            {
+                cout<<" ----> ";
+            }
+            else
+            {
+                cout<<"       ";
+            }
+            cout<<i + 1<<"  ";
+            puts(menu[i]);
+        }
+        strzalka=getch();
+        if(strzalka == 0)
+        {
+            strzalka=getch();
+            if(strzalka == 80)
+            {
+                *stan += 1;
+                if(*stan == n)
+                {
+                    *stan = 0;
+                }
+            }
+            else if(strzalka == 72)
+            {
+                *stan -= 1;
+                if(*stan == -1)
+                {
+                    *stan = n-1;
+                }
+            }
+        }
+        else if(strzalka == 13)
+            return *stan;
+    }
+}
+
+int main()
+{
+    bool aktywna = true;
+    int stan = 0;
     Conio2_Init();
     setvbuf(stdin, NULL, _IOLBF, 0);
 
-    // Rysowanie planszy do backgammona
-    wyswietlPlansze();
-
-    while (!czyKoniecGry()) {
-        // Rzut kostką i wyświetlenie wyniku
-        int liczbaPolO = rzutKostkami();
-        gotoxy(80, 1);
-        cout << "Wynik rzutu kostkami: " << liczbaPolO;
-
-        // Wybór pola i ruch pionkiem dla gracza O
-        int poleWyboruO = wybierzPole();
-        ruchPionkiem(graczO, liczbaPolO);
-
-        // Aktualizacja planszy po ruchu gracza O
-        wyswietlPlansze();
-
-        // Rzut kostką i wyświetlenie wyniku
-        int liczbaPolX = rzutKostkami();
-        gotoxy(80, 1);
-        cout << "Wynik rzutu kostkami: " << liczbaPolX;
-
-        // Wybór pola i ruch pionkiem dla gracza X
-        int poleWyboruX = wybierzPole();
-        ruchPionkiem(graczX, liczbaPolX);
-
-        // Aktualizacja planszy po ruchu gracza X
-        wyswietlPlansze();
+    while(aktywna)
+    {
+        menu(&stan);
+        if(stan == 0)
+            gra(true);
+        else if(stan == 1)
+        { //TODO wczytywanie }
+        else if(stan == 2)
+        { //TODO statystyki }
+        else
+            aktywna = false;
     }
-
-    // Oczekiwanie na naciśnięcie klawisza przed zakończeniem programu
-    getch();
 
     return 0;
 }
