@@ -61,14 +61,29 @@ struct Gracz
     }
 };
 
+//Funkcja do narysowania strzalki mozliwego zbicia pionka skierowanej w dol
+void strzalkaDol(int wybrane, int y)
+{
+    gotoxy((12 + (wybrane-13) * 5), y);
+    cout << "\\/" ;
+}
+
+//Funkcja do narysowania strzalki mozliwego zbicia pionka skierowanej w gore
+void strzalkaGora(int wybrane, int y)
+{
+    gotoxy((12 + (12-wybrane) * 5), y);
+    cout << "/\\ " ;
+}
+
 struct StanGry
 {
     int kostki[2];
     int pozostaleRuchy;
     bool turaGracza1;
     bool wykonanoRuch;
-    bool zbicie;
+    bool bicie;
     int mozliweRuchy[4];
+    int mozliweBicia[4];
 
     void koniecTury()
     {
@@ -76,9 +91,11 @@ struct StanGry
         kostki[0]=0;
         kostki[1]=0;
         pozostaleRuchy=0;
+        bicie = false;
         for(int i=0; i<4; i++)
         {
             mozliweRuchy[i]=0;
+            mozliweBicia[i]=0;
         }
     }
 
@@ -90,7 +107,12 @@ struct StanGry
             if(miejsceRuchu == mozliweRuchy[i])
             {
                 mozliweRuchy[i] = 0;
-                break;;
+                break;
+            }
+            else if(miejsceRuchu == mozliweBicia[i])
+            {
+                mozliweBicia[i] = 0;
+                break;
             }
         }
         if(kostki[0] != kostki[1])
@@ -108,7 +130,7 @@ struct StanGry
                 }
             }
         }
-
+        bicie = false;
         wykonanoRuch = true;
         pozostaleRuchy = pozostaleRuchy - 1;
     }
@@ -142,10 +164,44 @@ struct StanGry
         if(poleDocelowe>0 && poleDocelowe<25)
             for(int i=0; i<4; i++)
             {
-                if(poleDocelowe == mozliweRuchy[i])
-                    return true;
+                if(bicie)
+                {
+                    if(poleDocelowe == mozliweBicia[i])
+                        return true;
+                }
+                else
+                {
+                    if(poleDocelowe == mozliweRuchy[i])
+                        return true;
+                }
             }
         return false;
+    }
+
+    void rysujRuchy()
+    {
+        if(bicie)
+            for(int i=0; i<4; i++)
+            {
+                if(mozliweBicia[i]>0 && mozliweBicia[i]<13)
+                {
+                    strzalkaGora(mozliweBicia[i], 22);
+                    strzalkaGora(mozliweBicia[i], 23);
+                }
+                else if(mozliweBicia[i]>12 && mozliweBicia[i]<25)
+                {
+                    strzalkaDol(mozliweBicia[i], 3);
+                    strzalkaDol(mozliweBicia[i], 4);
+                }
+            }
+        else
+            for(int i=0; i<4; i++)
+            {
+                if(mozliweRuchy[i]>0 && mozliweRuchy[i]<13)
+                    strzalkaGora(mozliweRuchy[i], 22);
+                else if(mozliweRuchy[i]>12 && mozliweRuchy[i]<25)
+                    strzalkaDol(mozliweRuchy[i], 4);
+            }
     }
 
     bool daSieRuszyc()
@@ -306,49 +362,27 @@ void wyswietlPlansze(Gracz *gracz1, Gracz *gracz2)
     rysujPionki(gracz1, gracz2);
 }
 
-void strzalkaDol(int wybrane, int y)
+bool sprawdzPole(int wybrane, int sprawdzane, StanGry *stanGry, int i)
 {
-    gotoxy((12 + (wybrane-13) * 5), y);
-    cout << "\\/" ;
-}
-
-void strzalkaGora(int wybrane, int y)
-{
-    gotoxy((12 + (12-wybrane) * 5), y);
-    cout << "/\\ " ;
-}
-
-bool sprawdzPole(int wybrane, int sprawdzane, StanGry *stanGry)
-{
+    bool znalezionoBicie = false;
     if(wybrane != sprawdzane)
     {
         if(wybrane>12 && wybrane<25 && sprawdzane == 1)
-        {
-            strzalkaDol(wybrane, 3);
-            strzalkaDol(wybrane, 4);
-            stanGry->zbicie = true;
-        }
+            stanGry->bicie = znalezionoBicie = true;
         else if(wybrane<13 && wybrane>0 && sprawdzane == 1)
-        {
-            strzalkaGora(wybrane, 22);
-            strzalkaGora(wybrane, 23);
-            stanGry->zbicie = true;
-        }
-
-        else if(wybrane>12 && wybrane<25 && sprawdzane == 0 && !stanGry->zbicie)
-        {
-            strzalkaDol(wybrane, 4);
-        }
-
-        else if(wybrane<12 && wybrane>0 && sprawdzane == 0 && !stanGry->zbicie)
-        {
-            strzalkaGora(wybrane, 22);
-        }
+            stanGry->bicie = znalezionoBicie = true;
+        else if((wybrane>12 && wybrane<25 && sprawdzane == 0) || (wybrane<12 && wybrane>0 && sprawdzane == 0))
+        { }
         else
             return false;
     }
     else
         return false;
+    if(znalezionoBicie)
+    {
+        stanGry->mozliweBicia[i]=wybrane;
+        return false;
+    }
     return true;
 }
 
@@ -373,10 +407,12 @@ void rysujMozliweRuchy(Gracz *czekajacy, int wybor, StanGry *stanGry)
                 poprawne = true;
         }
         if(poprawne)
-            if(sprawdzPole(wybrane, czekajacy->pionki[wybrane-1], stanGry))
+            if(sprawdzPole(wybrane, czekajacy->pionki[wybrane-1], stanGry, i))
                 stanGry->mozliweRuchy[i]=wybrane;
+
         poprawne=false;
     }
+    stanGry->rysujRuchy();
 }
 
 void czyscMozliweRuchy()
@@ -518,7 +554,7 @@ int gra(bool nowa)
     bool start = true;
     int wybor;
     Gracz gracz1, gracz2;
-    StanGry stanGry = {{0,0},0,true, true, false, {0,0,0,0}};
+    StanGry stanGry = {{0,0},0,true, true, false, {0,0},{0,0}};
     if(nowa)
         nowaGra(&gracz1, &gracz2);
     else if(!wczytaj(&gracz1, &gracz2, &stanGry))
