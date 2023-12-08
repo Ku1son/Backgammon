@@ -67,6 +67,7 @@ struct StanGry
     int pozostaleRuchy;
     bool turaGracza1;
     bool wykonanoRuch;
+    bool zbicie;
     int mozliweRuchy[4];
 
     void koniecTury()
@@ -305,33 +306,43 @@ void wyswietlPlansze(Gracz *gracz1, Gracz *gracz2)
     rysujPionki(gracz1, gracz2);
 }
 
-bool sprawdzPole(int wybrane, int sprawdzane)
+void strzalkaDol(int wybrane, int y)
+{
+    gotoxy((12 + (wybrane-13) * 5), y);
+    cout << "\\/" ;
+}
+
+void strzalkaGora(int wybrane, int y)
+{
+    gotoxy((12 + (12-wybrane) * 5), y);
+    cout << "/\\ " ;
+}
+
+bool sprawdzPole(int wybrane, int sprawdzane, StanGry *stanGry)
 {
     if(wybrane != sprawdzane)
     {
-        if(wybrane>12 && wybrane<25 && sprawdzane == 0)
+        if(wybrane>12 && wybrane<25 && sprawdzane == 1)
         {
-            gotoxy((12 + (wybrane-13) * 5), 4);
-            cout << "\\/" ;
-        }
-        else if(wybrane>12 && wybrane<25 && sprawdzane == 1)
-        {
-            gotoxy((12 + (wybrane-13) * 5), 3);
-            cout << "\\/" ;
-            gotoxy((12 + (wybrane-13) * 5), 4);
-            cout << "\\/" ;
-        }
-        else if(wybrane<12 && wybrane>0 && sprawdzane == 0)
-        {
-            gotoxy((12 + (12-wybrane) * 5), 22);
-            cout << "/\\ " ;
+            strzalkaDol(wybrane, 3);
+            strzalkaDol(wybrane, 4);
+            stanGry->zbicie = true;
         }
         else if(wybrane<13 && wybrane>0 && sprawdzane == 1)
         {
-            gotoxy((12 + (12-wybrane) * 5), 22);
-            cout << "/\\ " ;
-            gotoxy((12 + (12-wybrane) * 5), 23);
-            cout << "/\\ " ;
+            strzalkaGora(wybrane, 22);
+            strzalkaGora(wybrane, 23);
+            stanGry->zbicie = true;
+        }
+
+        else if(wybrane>12 && wybrane<25 && sprawdzane == 0 && !stanGry->zbicie)
+        {
+            strzalkaDol(wybrane, 4);
+        }
+
+        else if(wybrane<12 && wybrane>0 && sprawdzane == 0 && !stanGry->zbicie)
+        {
+            strzalkaGora(wybrane, 22);
         }
         else
             return false;
@@ -362,7 +373,7 @@ void rysujMozliweRuchy(Gracz *czekajacy, int wybor, StanGry *stanGry)
                 poprawne = true;
         }
         if(poprawne)
-            if(sprawdzPole(wybrane, czekajacy->pionki[wybrane-1]))
+            if(sprawdzPole(wybrane, czekajacy->pionki[wybrane-1], stanGry))
                 stanGry->mozliweRuchy[i]=wybrane;
         poprawne=false;
     }
@@ -507,7 +518,7 @@ int gra(bool nowa)
     bool start = true;
     int wybor;
     Gracz gracz1, gracz2;
-    StanGry stanGry = {{0,0},0,true, true, {0,0,0,0}};
+    StanGry stanGry = {{0,0},0,true, true, false, {0,0,0,0}};
     if(nowa)
         nowaGra(&gracz1, &gracz2);
     else if(!wczytaj(&gracz1, &gracz2, &stanGry))
