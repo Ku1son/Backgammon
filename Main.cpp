@@ -455,7 +455,7 @@ void niepoprawne()
 void utrataRuchu()
 {
     gotoxy(80, 6);
-    cputs("Nie ma poprawnego ruchu, pas.");
+    cputs("Nie ma poprawnego ruchu, pas, wcisnij enter.");
 }
 
 bool poprawnyRuch(Gracz *czekajacy, int wybor, StanGry *stanGry, bool powrot)
@@ -642,8 +642,10 @@ int gra(bool nowa)
             stanGry.koniecTury();
             if(stanGry.pas)
             {
+                char a;
                 stanGry.pas = false;
                 utrataRuchu();
+                cin>>a;
             }
         }
     }
