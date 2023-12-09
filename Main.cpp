@@ -104,16 +104,8 @@ struct StanGry
         int delta;
         for(int i=0; i<4; i++)
         {
-            if(miejsceRuchu == mozliweRuchy[i])
-            {
-                mozliweRuchy[i] = 0;
-                break;
-            }
-            else if(miejsceRuchu == mozliweBicia[i])
-            {
-                mozliweBicia[i] = 0;
-                break;
-            }
+            mozliweRuchy[i] = 0;
+            mozliweBicia[i] = 0;
         }
         if(kostki[0] != kostki[1])
         {
@@ -208,7 +200,12 @@ struct StanGry
     {
         for(int i=0; i<4; i++)
         {
-            if(mozliweRuchy[i] != 0)
+            if(bicie)
+            {
+                if(mozliweBicia[i] != 0)
+                    return true;
+            }
+            else if(mozliweRuchy[i] != 0)
                 return true;
         }
         return false;
@@ -362,10 +359,10 @@ void wyswietlPlansze(Gracz *gracz1, Gracz *gracz2)
     rysujPionki(gracz1, gracz2);
 }
 
-bool sprawdzPole(int wybrane, int sprawdzane, StanGry *stanGry, int i)
+bool sprawdzPole(int wybrane, int poleStart, int sprawdzane, StanGry *stanGry, int i)
 {
     bool znalezionoBicie = false;
-    if(wybrane != sprawdzane)
+    if(wybrane != poleStart)
     {
         if(wybrane>12 && wybrane<25 && sprawdzane == 1)
             stanGry->bicie = znalezionoBicie = true;
@@ -386,28 +383,28 @@ bool sprawdzPole(int wybrane, int sprawdzane, StanGry *stanGry, int i)
     return true;
 }
 
-void rysujMozliweRuchy(Gracz *czekajacy, int wybor, StanGry *stanGry)
+void rysujMozliweRuchy(Gracz *czekajacy, int poleStart, StanGry *stanGry)
 {
     int wybrane;
     bool poprawne = false;
     for(int i=0; i<4; i++)
     {
         if(i<2)
-            wybrane = wybor + stanGry->kostki[i];
+            wybrane = poleStart + stanGry->kostki[i];
         else
-            wybrane = wybor - stanGry->kostki[i%2];
+            wybrane = poleStart - stanGry->kostki[i%2];
         if(czekajacy->kierunekDodatni)
         {
-            if(wybrane < wybor)
+            if(wybrane < poleStart)
                 poprawne = true;
         }
         else
         {
-            if(wybrane > wybor)
+            if(wybrane > poleStart)
                 poprawne = true;
         }
         if(poprawne)
-            if(sprawdzPole(wybrane, czekajacy->pionki[wybrane-1], stanGry, i))
+            if(sprawdzPole(wybrane, poleStart, czekajacy->pionki[wybrane-1], stanGry, i))
                 stanGry->mozliweRuchy[i]=wybrane;
 
         poprawne=false;
@@ -444,8 +441,7 @@ bool poprawnyRuch(Gracz *czekajacy, int wybor, StanGry *stanGry)
     {
         gotoxy(80, 5);
         clreol();
-        gotoxy(80, 6);
-        cout << "Wybierz inne, poprawne pole.";
+        niepoprawne();
         return false;
     }
     else
