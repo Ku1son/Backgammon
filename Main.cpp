@@ -9,25 +9,22 @@ using namespace std;
 
 struct Gracz
 {
-    //Polozenie i ilosc pionkow gracza
-    int pionki[24];
-    //ilosc pionkow na dworze
-    int dwor;
-    //ilosc zbitych pionkow
-    int zbite;
-    //kierunek ruchow pionkow gracza
-    bool kierunekDodatni;
+    int pionki[24];         // 24 pola a wartosc to ilosc pionkow na danym polu
+    int dwor;               // ilosc pionkow na dworze
+    int zbitePionki;              // ilosc zbitych pionkow
+    bool kierunekDodatni;   // kierunek ruchow pionkow gracza
+
 
     bool czyZbite()
     {
-        if(zbite>0)
+        if(zbitePionki>0)
             return true;
         return false;
     }
 
     bool kompletDom()
     {
-        if(zbite>0)
+        if(zbitePionki>0)
             return false;
         for(int i=0; i<18; i++)
         {
@@ -41,7 +38,7 @@ struct Gracz
     {
         fwrite(pionki, sizeof(int), 24, plik);
         fwrite(&dwor, sizeof(int), 1, plik);
-        fwrite(&zbite, sizeof(int), 1, plik);
+        fwrite(&zbitePionki, sizeof(int), 1, plik);
         fwrite(&kierunekDodatni, sizeof(bool), 1, plik);
     }
 
@@ -49,56 +46,53 @@ struct Gracz
     {
         fread(pionki, sizeof(int), 24, plik);
         fread(&dwor, sizeof(int), 1, plik);
-        fread(&zbite, sizeof(int), 1, plik);
+        fread(&zbitePionki, sizeof(int), 1, plik);
         fread(&kierunekDodatni, sizeof(bool), 1, plik);
     }
 
-    void ruchPionka(Gracz* przeciwnik, int polePionka, int miejsceRuchu)
+    void ruchPionka(Gracz* przeciwnik, int miejsceStartu, int miejsceDocelowe)
     {
-        if(polePionka == 0 || polePionka == 25)
-            zbite = zbite - 1;
-        else
-            pionki[polePionka-1] = pionki[polePionka-1] - 1;
-        pionki[miejsceRuchu - 1] = pionki[miejsceRuchu - 1] + 1;
-        if(przeciwnik->pionki[miejsceRuchu - 1] == 1)
+        if (miejsceStartu == 0 || miejsceStartu == 25)    // DALCZEGO DLA 0 ZMNIEJSZAMY ILOSC ZBITYCH PIONOW???
         {
-            przeciwnik->pionki[miejsceRuchu - 1] = 0;
-            przeciwnik->zbite = przeciwnik->zbite + 1;
+            zbitePionki = zbitePionki - 1;  // zmniejszenie ilosc zbitych pionow
+        }   
+        else
+        {
+            pionki[miejsceStartu-1] = pionki[miejsceStartu-1] - 1;                 // zmniejszenie wartosci tablicy o 1 (wartosc tablicy to ilosc pionkow na danym polu)
+            pionki[miejsceDocelowe - 1] = pionki[miejsceDocelowe - 1] + 1;   // zwiekszenie wartosc tablicy o 1 (tam gdzie pionek ma sie przemiescic)         
+        }
+        if(przeciwnik->pionki[miejsceDocelowe - 1] == 1)        // jesli jest jeden pion przeciwnika na docelowym miejscu (UTWORZENIE WARUNKU NA BICIE)
+        {
+            przeciwnik->pionki[miejsceDocelowe - 1] = 0;         // zdjecie zbitego pionka
+            przeciwnik->zbitePionki = przeciwnik->zbitePionki + 1;          // zliczanie zbitych pionkow zostaje zwiekszone o 1
         }
     }
 };
 
-//Funkcja do narysowania strzalki mozliwego zbicia pionka skierowanej w dol
-void strzalkaDol(int wybrane, int y)
+void strzalkaNaGorze(int miejsceDocelowe, int y)
 {
-    gotoxy((12 + (wybrane-13) * 5), y);
-    cputs("\\/");
+    gotoxy((12 + (miejsceDocelowe-13) * 5), y);
+    cputs("\\\/");
 }
 
-//Funkcja do narysowania strzalki mozliwego zbicia pionka skierowanej w gore
-void strzalkaGora(int wybrane, int y)
+void strzalkaNaDole(int miejsceDocelowe, int y)
 {
-    gotoxy((12 + (12-wybrane) * 5), y);
-    cputs("/\\ ");
+    gotoxy((12 + (12-miejsceDocelowe) * 5), y);
+    cputs("^");
 }
 
 struct StanGry
 {
-    //wyniki rzutow kostkami
     int kostki[2];
-    //ilosc pozostalych ruchow gracza
     int pozostaleRuchy;
-    //ruchy mozlwie do wykonania po wybraniu piona
-    int mozliweRuchy[4];
-    //bicia mozlwie do wykonania po wybraniu piona
-    int mozliweBicia[4];
-    //inforamcja czy
+    int mozliweRuchy[4];        // ruchy mozlwie do wykonania po wybraniu piona     (przyjmuja zakres od 0 do 24 gdzie 0 to brak ruchu)
+    int mozliweBicia[4];        // bicia mozlwie do wykonania po wybraniu piona     (przyjmuja zakres od 0 do 24 gdzie 0 to brak bicia)
     bool turaGracza1;
     bool wykonanoRuch;
     bool bicie;
     bool pas;
 
-    StanGry()
+    StanGry()                   // ????????????????????????? CZYM SIE ROZNI OD koniecTury       I CO TO W OGOLE JEST XD
     {
         kostki[0] = 0;
         kostki[1] = 0;
@@ -115,8 +109,7 @@ struct StanGry
 
     }
 
-    //Funkcja porzadkujaca zmienne po zakonczeniu wszystkich ruchow gracza
-    void koniecTury()
+    void koniecTury()               // po zakoneczeniu tury (wszystkich ruchow)
     {
         turaGracza1 = !turaGracza1;
         kostki[0]=0;
@@ -130,29 +123,26 @@ struct StanGry
         }
     }
 
-    //Funkcja po zakonczeniu ruchu
-    //miejsce ruchu - pole do ktorego pion sie rusza
-    //wybor - pole z ktorego pion sie rusza
-    void poRuchu(int miejsceRuchu, int wybor)
+    
+    void poRuchu(int miejsceDocelowe, int miejsceStartu)        // po zakonczeniu jednego ruchu
     {
-        int delta;
+        int roznica;
         for(int i=0; i<4; i++)
         {
             mozliweRuchy[i] = 0;
             mozliweBicia[i] = 0;
         }
-        //wykrywanie ktora kostka zostala zuzyta
-        if(kostki[0] != kostki[1])
+        if(kostki[0] != kostki[1])      // sprawdzenie ktora kostka zostala uzyta
         {
-            if(wybor - miejsceRuchu > 0)
-                delta = wybor - miejsceRuchu;
+            if(miejsceStartu - miejsceDocelowe > 0)
+                roznica = miejsceStartu - miejsceDocelowe;
             else
-                delta = miejsceRuchu - wybor;
+                roznica = miejsceDocelowe - miejsceStartu;
             for(int i=0; i<2; i++)
             {
-                if(delta == kostki[i])
+                if(roznica == kostki[i])
                 {
-                    kostki[i] = 0;
+                    kostki[i] = 0;      // zerowanie zuzytej kostki
                     break;
                 }
             }
@@ -188,76 +178,73 @@ struct StanGry
             pozostaleRuchy = 2;
     }
 
-    //Sprawdzanie w zaleznosci od zmiennej bicie, czy wybrane przez gracza pole docelowe jest poprwanym celem ruchu
-    bool mozliwyRuch(int poleDocelowe)
+    bool mozliwyRuch(int poleDocelowe)          // sprawdzanie w zaleznosci od zmiennej bicie, czy wybrane przez gracza pole docelowe jest poprwanym celem ruchu
     {
-        if(poleDocelowe>0 && poleDocelowe<25)
+        if(poleDocelowe>0 && poleDocelowe<25)       // czy miescimy sie w zakresie
             for(int i=0; i<4; i++)
             {
-                if(bicie)
+                if(bicie)        
                 {
-                    if(poleDocelowe == mozliweBicia[i])
+                    if(poleDocelowe == mozliweBicia[i])     // zwraca true jesli istnieje wykonanie ruchu jako bicie
                         return true;
                 }
                 else
                 {
-                    if(poleDocelowe == mozliweRuchy[i])
+                    if(poleDocelowe == mozliweRuchy[i])     // zwraca true jesli istnieje wykonanie ruchu jako normalny ruch
                         return true;
                 }
             }
         return false;
     }
 
-    //Funkcja rysujaca strzalki wskazujace na mozliwe ruchy, na podstawie znalezionych ruchow
-    void rysujRuchy()
+    void rysujStrzalki()            // funkcja rysujaca strzalki wskazujace na mozliwe ruchy, na podstawie znalezionych ruchow
     {
-        if(bicie)
+        if(bicie)                                               // strzalki dla bicia
             for(int i=0; i<4; i++)
             {
                 if(mozliweBicia[i]>0 && mozliweBicia[i]<13)
                 {
-                    strzalkaGora(mozliweBicia[i], 22);
-                    strzalkaGora(mozliweBicia[i], 23);
+                    strzalkaNaDole(mozliweBicia[i], 22);
+                    strzalkaNaDole(mozliweBicia[i], 23);
                 }
                 else if(mozliweBicia[i]>12 && mozliweBicia[i]<25)
                 {
-                    strzalkaDol(mozliweBicia[i], 3);
-                    strzalkaDol(mozliweBicia[i], 4);
+                    strzalkaNaGorze(mozliweBicia[i], 3);
+                    strzalkaNaGorze(mozliweBicia[i], 4);
                 }
             }
-        else
+        else                                                   // strzalki dla normalnego ruchu
             for(int i=0; i<4; i++)
             {
                 if(mozliweRuchy[i]>0 && mozliweRuchy[i]<13)
-                    strzalkaGora(mozliweRuchy[i], 22);
+                    strzalkaNaDole(mozliweRuchy[i], 22);
                 else if(mozliweRuchy[i]>12 && mozliweRuchy[i]<25)
-                    strzalkaDol(mozliweRuchy[i], 4);
+                    strzalkaNaGorze(mozliweRuchy[i], 4);
             }
     }
 
-    //Sprawdzanie czy dany pionek ma dostepne poprawne ruchy
-    bool daSieRuszyc()
+    bool daSieRuszyc()              // sprawdzanie czy dany pionek ma dostepne poprawne ruchy
     {
         for(int i=0; i<4; i++)
         {
             if(bicie)
             {
-                if(mozliweBicia[i] != 0)
+                if(mozliweBicia[i] != 0)        // jak 0 to nie mozna sie ruszyc
                     return true;
             }
-            else if(mozliweRuchy[i] != 0)
+            else if(mozliweRuchy[i] != 0)       // jak 0 to nie mozna sie ruszyc
                 return true;
         }
         return false;
     }
 };
 
-//Inicjalizacja nowej gry
-void nowaGra(Gracz *gracz1, Gracz *gracz2)
+void nowaGra(Gracz *gracz1, Gracz *gracz2)      // inicjalizacja nowej gry
 {
     *gracz1 = {{2,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,3,0,5,0,0,0,0,0}, 0, 0, true};
     *gracz2 = {{0,0,0,0,0,5,0,3,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,2}, 0, 0, false};
 }
+
 
 //Funkcja zapisujaca stan gry do pliku
 //gracz1 - obecnie ruszajacy sie gracz
@@ -299,10 +286,9 @@ bool wczytaj(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry)
     return true;
 }
 
-//Funkcja rysujaca obramowanie planszy w konsoli
 void rysujObramowanie()
 {
-    for (int i=0; i<SZEROKOSC; i++)
+    for (int i=0; i<SZEROKOSC; i++)     // dla kazdej kolumny 3 wiersze
     {
         for (int j=6; j<=20; j+=7)
         {
@@ -313,7 +299,7 @@ void rysujObramowanie()
                 cputs("=");
         }
     }
-    for (int i=0; i<WYSOKOSC; i++)
+    for (int i=0; i<WYSOKOSC; i++)      // dla kazdego wiersza 3 kolumny
     {
         for (int j=10; j<=70; j+=30)
         {
@@ -321,19 +307,18 @@ void rysujObramowanie()
             cputs(":");
         }
     }
-    for (int i=13; i<=24; i++)
+    for (int i=13; i<=24; i++)      // liczby
     {
         gotoxy((12 + (i-13) * 5), 5);
-        cout<<i;
+        cout << i;
     }
-    for (int i = 12; i >= 1; --i)
+    for (int i = 12; i >= 1; --i)    // liczby
     {
         gotoxy((12 + (12 - i) * 5), 21);
-        cout<<i;
+        cout << i;
     }
 }
 
-//Funkcja wypisujaca opcje dostepne po wyborze piona do ruchu
 void tekstWyboruPionka()
 {
     gotoxy(80, 2);
@@ -349,9 +334,9 @@ void tekstWyboruPionka()
 //Funkcja wypisujaca zbite pionki nad plansza
 void rysujZbite(Gracz *gracz)
 {
-    for(int i=0; i<gracz->zbite; i++)
+    for(int i=0; i< gracz->zbitePionki; i++)
     {
-        if(i>0)
+        if(i>0)             // ten przecinek wykona sie przynajmniej dla i=1 wiec druga iteracja
             cputs(", ");
         if(gracz->kierunekDodatni)
             cputs("()");
@@ -361,15 +346,13 @@ void rysujZbite(Gracz *gracz)
     cputs("       ");
 }
 
-//Funkcja wyrysowujaca piony bydwoch graczy na odpowiednich polach
-//gracz1 - obecnie ruszajacy sie gracz
-//gracz2 - obecnie nie ruszajacy sie gracz
-void rysujPionki(Gracz *gracz1, Gracz *gracz2)
+
+void rysujPionki(Gracz *gracz1, Gracz *gracz2)      //gracz1 - obecnie ruszajacy sie gracz    gracz2 - obecnie nie ruszajacy sie gracz
 {
     for(int i=0; i<12; i++)
     {
         //gorna czesc planszy
-        if(gracz1->pionki[12+i]>0)
+        if(gracz1->pionki[12+i]>0)      // wieksze od 0 bo w tej tablicy wartosc to ilosc pionkow na danym polu
         {
             for(int j=0; j<gracz1->pionki[12+i]; j++)
             {
@@ -409,10 +392,8 @@ void rysujPionki(Gracz *gracz1, Gracz *gracz2)
     rysujZbite(gracz2);
 }
 
-//Funkcja rysujaca plansze na podstawie pionow dwoch graczy
-//gracz1 - obecnie ruszajacy sie gracz
-//gracz2 - obecnie nie ruszajacy sie gracz
-void wyswietlPlansze(Gracz *gracz1, Gracz *gracz2)
+
+void wyswietlPlansze(Gracz *gracz1, Gracz *gracz2)      // gracz1 - obecnie ruszajacy sie gracz  gracz2 - obecnie nie ruszajacy sie gracz
 {
     system("cls");
     rysujObramowanie();
@@ -420,35 +401,29 @@ void wyswietlPlansze(Gracz *gracz1, Gracz *gracz2)
 }
 
 //Sprawdzanie czy pole docelowe jest poprwanym ruchem lub biciem
-//wybrane - docelowe pole ruchu piona
-//poleStart - pole poczatkowe piona
-//sprawdzone - ile pionow przeciwnik ma na polu docelowym
-//stanGry - struktura z informacjami o stanie gry
-//i - iteracja petli funkcji wywolujacej
-//powrot - informacja czy ruch dotyczy piona wracajacego na plansze
-//return informacja czy wybrane pole jest poprawnym ruchem
+//sprawdzane - ile pionow przeciwnik ma na polu docelowym
 //false w wypadku zbicia lub niepoprawnego ruchu
-bool sprawdzPole(int wybrane, int poleStart, int sprawdzane, StanGry *stanGry, int i, bool powrot)
+bool sprawdzPole(int miejsceDocelowe, int miejsceStartu, int sprawdzane, StanGry *stanGry, int i, bool powrot)
 {
     bool zbicie = false;
-    if(wybrane != poleStart)
+    if(miejsceDocelowe != miejsceStartu)
     {
-        if(powrot)
+        if(powrot)      // dla powrotu
         {
-            if((poleStart == 0 && wybrane < 7) || (poleStart == 25 && wybrane > 18))
+            if((miejsceStartu == 0 && miejsceDocelowe < 7) || (miejsceStartu == 25 && miejsceDocelowe > 18))        
             {
-                if(sprawdzane == 1)
-                    stanGry->bicie = zbicie = true;
+                if(sprawdzane == 1)                     // jak pion powraca i jest bicie
+                    stanGry->bicie = zbicie = true;         // ??????????????
                 else if(sprawdzane > 1)
                     return false;
             }
         }
-        else
+        else    // dla nie powrotu
         {
-            if(wybrane>0 && wybrane<25 && sprawdzane == 1)
+            if(miejsceDocelowe>0 && miejsceDocelowe<25 && sprawdzane == 1)
                 stanGry->bicie = zbicie = true;
-            else if((wybrane>12 && wybrane<25 && sprawdzane == 0) || (wybrane<12 && wybrane>0 && sprawdzane == 0))
-            { }
+            else if((miejsceDocelowe>12 && miejsceDocelowe<25 && sprawdzane == 0) || (miejsceDocelowe<12 && miejsceDocelowe>0 && sprawdzane == 0))
+            { }     // ???????????????
             else
                 return false;
         }
@@ -457,57 +432,51 @@ bool sprawdzPole(int wybrane, int poleStart, int sprawdzane, StanGry *stanGry, i
         return false;
     if(zbicie)
     {
-        stanGry->mozliweBicia[i]=wybrane;
-        return false;
+        stanGry->mozliweBicia[i] = miejsceDocelowe;
+        return false;                                   // CZEMU ZWRACAMY FALSE???
     }
     return true;
 }
 
-//Funkcja sprawdzajaca i rysujaca mozliwe ruchy
-//czekajacy - wskaznik na gracza ktory obecnie nie ma swojej tury
-//poleStart - pole z ktorego pion sie ma poruszyc
-//stanGry - struktura z informacjami o stanie gry
-//powrot - informacja czy ruch dotyczy piona wracajacego na plansze
-void rysujMozliweRuchy(Gracz *czekajacy, int poleStart, StanGry *stanGry, bool powrot)
+// funkcja sprawdzajaca i rysujaca mozliwe ruchy
+void rysujMozliweRuchy(Gracz *czekajacy, int miejsceStartu, StanGry *stanGry, bool powrot)      // SKAD WIEMY ZE TO NAPRAWDE JEST CZEKAJACY???
 {
-    //wybrane - sprawdzane pole docelowe ruchu piona
-    int wybrane;
-    bool poprawne = false;
+    int miejsceDocelowe;
+    bool poprawne = false;      // stworzone na potrzeby tej funkcji
 
-    //Petla sprawdzajaca czy wybrany pion moze sie poruszyc
+    // petla sprawdzajaca czy wybrany pion moze sie poruszyc
     for(int i=0; i<4; i++)
     {
-        //Ustalenie wartosci zmiennej wybrane
-        if(i<2)
-            wybrane = poleStart + stanGry->kostki[i];
+        // ustalenie wartosci zmiennej miejsceDocelowe
+        if(i<2)                                                         // dla dwoch kostek po dwa razy
+            miejsceDocelowe = miejsceStartu + stanGry->kostki[i];   
         else
-            wybrane = poleStart - stanGry->kostki[i%2];
+            miejsceDocelowe = miejsceStartu - stanGry->kostki[i%2];
 
-        //Sprawdzenie czy wybrane pole docelowe ruchu jest zgodne z kierunkiem ruchu pionow gracza
-        if(czekajacy->kierunekDodatni)
+        // sprawdzenie czy wybrane pole docelowe ruchu jest zgodne z kierunkiem ruchu pionow gracza
+        if(czekajacy->kierunekDodatni)              // CZEMU CZEKAJACY
         {
-            if(wybrane < poleStart)
+            if(miejsceDocelowe < miejsceStartu)     // CZY TU NIE MA NA ODWROT???
                 poprawne = true;
         }
         else
         {
-            if(wybrane > poleStart)
+            if(miejsceDocelowe > miejsceStartu)
                 poprawne = true;
         }
 
         if(poprawne)
             //Sprawdzanie czy znaleziony ruch jest poprawnym ruchem, jesli jest biciem to kolejny if zwraca false, a pole bicia zpisane jest wewnatrz funkcji sprawdzPole()
-            if(sprawdzPole(wybrane, poleStart, czekajacy->pionki[wybrane-1], stanGry, i, powrot))
+            if(sprawdzPole(miejsceDocelowe, miejsceStartu, czekajacy->pionki[miejsceDocelowe-1], stanGry, i, powrot))
                 //jesli pole jest poprawnym ruchem, zapisujemy go do tablicy
-                stanGry->mozliweRuchy[i]=wybrane;
+                stanGry->mozliweRuchy[i]=miejsceDocelowe;
 
         poprawne=false;
     }
-    stanGry->rysujRuchy();
+    stanGry->rysujStrzalki();       // CZEMU TEGO NIE MA W PETLI???
 }
 
-//Wyczyszczenie zbednych linii tekstu na konsoli
-void czyscMozliweRuchy()
+void czyscMozliweRuchy()        // wyczyszczenie zbednych linii tekstu na konsoli   (KIEDY TAK SIE ZDARZYLO???)
 {
     gotoxy(1,3);
     clreol();
@@ -523,28 +492,21 @@ void czyscMozliweRuchy()
     clreol();
 }
 
-//Informacja wyswietlana przy wyborze zlego pola
 void niepoprawne()
 {
     gotoxy(80, 6);
     cputs("Wybierz inne, poprawne pole.");
 }
 
-//Informacja wyswietlana po przymusowym pasie
 void utrataRuchu()
 {
     gotoxy(80, 6);
     cputs("Nie ma poprawnego ruchu, pas, wcisnij enter.");
 }
 
-//Funckja sprawdzajaca czy wskazany ruch jest poprawny
-//czekajacy - obecnie nie ruszajacy sie gracz
-//wybor - wartosc pola z ktorego gracz aktywny chce poruszyc piona
-//stanGry - struktura z informacjami o stanie gry
-//powrot - informacja czy ruch dotyczy piona wracajacego na plansze
-bool poprawnyRuch(Gracz *czekajacy, int wybor, StanGry *stanGry, bool powrot)
+bool poprawnyRuchFinal(Gracz *czekajacy, int miejsceStartu, StanGry *stanGry, bool powrot)
 {
-    rysujMozliweRuchy(czekajacy, wybor, stanGry, powrot);
+    rysujMozliweRuchy(czekajacy, miejsceStartu, stanGry, powrot);
     if(!stanGry->daSieRuszyc())
     {
         gotoxy(80, 5);
@@ -556,8 +518,6 @@ bool poprawnyRuch(Gracz *czekajacy, int wybor, StanGry *stanGry, bool powrot)
         return true;
 }
 
-//Funkcja wypisujaca informacje ktory gracz sie rusza i w jakim kierunku
-//ruchGracza1 - zmienna informujaca czy rusza sie gracz 1
 void kolejnosc(bool ruchGracza1)
 {
     gotoxy(10, 2);
@@ -568,8 +528,6 @@ void kolejnosc(bool ruchGracza1)
         cputs("{}, w kierunku pola 1");
 }
 
-//Funkcja wypisujaca informacje o obecnym rzucie koscmi
-//stanGry - struktura z informacjami o stanie gry
 void wynikRzutu(StanGry *stanGry)
 {
     gotoxy(80, 8);
@@ -584,20 +542,17 @@ void wynikRzutu(StanGry *stanGry)
 
 //aktywny - obecnie ruszajacy sie gracz
 //czekajacy - obecnie nie ruszajacy sie gracz
-//wybor - wartosc pola z ktorego gracz aktywny chce poruszyc piona
-//stanGry - struktura z informacjami o stanie gry
-//powrot - informacja czy ruch dotyczy piona wracajacego na plansze
-int petlaRuchu(Gracz *aktywny, Gracz *czekajacy, int wybor, StanGry *stanGry, bool powrot)
+int ruch2(Gracz *aktywny, Gracz *czekajacy, int miejsceStartu, StanGry *stanGry, bool powrot)
 {
     bool pionekRuszony = false;
-    int miejsceRuchu;
+    int miejsceDocelowe;
     while(!pionekRuszony)
     {
         gotoxy(80, 7);
-        cin>>miejsceRuchu;
-        if(stanGry->mozliwyRuch(miejsceRuchu))
+        cin>>miejsceDocelowe;                                                       // wprowadzenie pola docelowego przez gracza
+        if(stanGry->mozliwyRuch(miejsceDocelowe))
         {
-            aktywny->ruchPionka(czekajacy, wybor, miejsceRuchu);
+            aktywny->ruchPionka(czekajacy, miejsceStartu, miejsceDocelowe);       
             pionekRuszony = true;
         }
         else
@@ -606,23 +561,20 @@ int petlaRuchu(Gracz *aktywny, Gracz *czekajacy, int wybor, StanGry *stanGry, bo
             cputs("Wybierz inne, poprawne pole");
         }
     }
-    return miejsceRuchu;
+    return miejsceDocelowe;
 }
 
 //Funkcja odpowiadajaca za ruch piona z wybranego pola
 //aktywny - obecnie ruszajacy sie gracz
 //czekajacy - obecnie nie ruszajacy sie gracz
-//wybor - wartosc pola z ktorego gracz aktywny chce poruszyc piona
-//stanGry - struktura z informacjami o stanie gry
-//powrot - informacja czy ruch dotyczy piona wracajacego na plansze
-void ruch(Gracz *aktywny, Gracz *czekajacy, int wybor, StanGry *stanGry, bool powrot)
+void ruch1(Gracz *aktywny, Gracz *czekajacy, int miejsceStartu, StanGry *stanGry, bool powrot)
 {
-    if((!powrot && aktywny->pionki[wybor-1]>0) || powrot && aktywny->zbite > 0)
+    if((!powrot && aktywny->pionki[miejsceStartu-1]>0) || powrot && aktywny->zbitePionki > 0) // jesli nie powraca i jest >0 pionkow lub powraca i jest cos zbitego   
     {
         gotoxy(80, 6);
         cputs("Wybierz miejsce ruchu: ");
-        int miejsceRuchu = petlaRuchu(aktywny, czekajacy, wybor, stanGry, powrot);
-        stanGry->poRuchu(miejsceRuchu, wybor);
+        int miejsceDocelowe = ruch2(aktywny, czekajacy, miejsceStartu, stanGry, powrot);
+        stanGry->poRuchu(miejsceDocelowe, miejsceStartu);
         czyscMozliweRuchy();
     }
     else
@@ -631,19 +583,18 @@ void ruch(Gracz *aktywny, Gracz *czekajacy, int wybor, StanGry *stanGry, bool po
     clreol();
 }
 
-//Ruch kiedy co najmniej jeden pion gracza jest zbity
 //gracz1 - obecnie ruszajacy sie gracz
 //gracz2 - obecnie nie ruszajacy sie gracz
 //stanGry - struktura z informacjami o stanie gry
 //pole - wartosc pola z ktorego gracz aktywny chce poruszyc piona
-void powrotPiona(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry, int pole)
-{
+void powrotPiona(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry, int miejsceStartu)      // CZY MOGE ZMIENIC NAZWE NA AKTYWNY I CZEKAJACY???
+{                                                                                       // GDZIE WYKORZYSTUJEMY TUTAJ POLE STARTU
     if(stanGry->turaGracza1)
     {
-        if(gracz1->zbite > 0)
+        if(gracz1->zbitePionki > 0)
         {
-            if(poprawnyRuch(gracz2, 0, stanGry, true))
-                ruch(gracz1, gracz2, 0, stanGry, true);
+            if(poprawnyRuchFinal(gracz2, 0, stanGry, true))     // true to powrot
+                ruch1(gracz1, gracz2, 0, stanGry, true);        // CZEMU MIEJSCE STARTU TO 0 JAK TYLKO Z 25 WPROWADZAMY
             else
             {
                 stanGry->wykonanoRuch = true;
@@ -655,10 +606,10 @@ void powrotPiona(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry, int pole)
     }
     else
     {
-        if(gracz2->zbite > 0)
+        if(gracz2->zbitePionki > 0)
         {
-            if(poprawnyRuch(gracz1, 25, stanGry, true))
-                ruch(gracz2, gracz1, 25, stanGry, true);
+            if(poprawnyRuchFinal(gracz1, 25, stanGry, true))
+                ruch1(gracz2, gracz1, 25, stanGry, true);
             else
             {
                 stanGry->wykonanoRuch = true;
@@ -674,63 +625,58 @@ void powrotPiona(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry, int pole)
 //gracz1 - obecnie ruszajacy sie gracz
 //gracz2 - obecnie nie ruszajacy sie gracz
 //stanGry - struktura z informacjami o stanie gry
-//pole - wartosc pola z ktorego gracz aktywny chce poruszyc piona
-void normalnyRuch(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry, int pole)
+void normalnyRuch(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry, int miejsceStartu)
 {
     if(stanGry->turaGracza1)
     {
-        if(gracz1->pionki[pole-1]>0 && gracz1->zbite == 0)
+        if(gracz1->pionki[miejsceStartu-1]>0 && gracz1->zbitePionki == 0)       // jesli na poluStartu sa jakies pionki i nie ma zbitych pionkow
         {
-            if(poprawnyRuch(gracz2, pole, stanGry, false))
-                ruch(gracz1, gracz2, pole, stanGry, false);
+            if(poprawnyRuchFinal(gracz2, miejsceStartu, stanGry, false))
+                ruch1(gracz1, gracz2, miejsceStartu, stanGry, false);
         }
         else
             niepoprawne();
     }
     else
     {
-        if(gracz2->pionki[pole-1]>0 && gracz2->zbite == 0)
+        if(gracz2->pionki[miejsceStartu-1]>0 && gracz2->zbitePionki == 0)
         {
-            if(poprawnyRuch(gracz1, pole, stanGry, false))
-                ruch(gracz2, gracz1, pole, stanGry, false);
+            if(poprawnyRuchFinal(gracz1, miejsceStartu, stanGry, false))
+                ruch1(gracz2, gracz1, miejsceStartu, stanGry, false);
         }
         else
             niepoprawne();
     }
 }
 
-//Glowna funkcja odpowiadajaca za wybor pola z ktorego bedziemy ruszac piona i wywolujaca kolejne funkcje
 //gracz1 - obecnie ruszajacy sie gracz
 //gracz2 - obecnie nie ruszajacy sie gracz
-//stanGry - struktura z informacjami o stanie gry
-int wybierzPole(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry)
+int wybierzPoleStartowe(Gracz *gracz1, Gracz *gracz2, StanGry *stanGry)     // funkcja glowna odpowiadajaca za wybor pola z ktorego bedziemy ruszac piona
 {
     stanGry->wykonanoRuch = false;
     while(true)
     {
-        int pole;
+        int poleStartowe;
         wynikRzutu(stanGry);
-        cin >> pole;
-        if(pole == 0)
-            return pole;
-        else if(pole == 25)
-            powrotPiona(gracz1, gracz2, stanGry, pole);
+        cin >> poleStartowe;
+        if(poleStartowe == 0)
+            return poleStartowe;  // DLACZEGO???
+        else if(poleStartowe == 25)
+            powrotPiona(gracz1, gracz2, stanGry, poleStartowe);
         else
-            normalnyRuch(gracz1, gracz2, stanGry, pole);
+            normalnyRuch(gracz1, gracz2, stanGry, poleStartowe);
         if(stanGry->wykonanoRuch == true)
         {
             stanGry->wykonanoRuch = false;
-            return 1;
+            return 1;       // DLACZEGO RETURN 1???
         }
     }
 }
 
-//Funkcja z glowna petla gry, wywolujaca inicjalizacje obiektow graczy i
-//nowa - zmienna informujaca czy jest ot nowa gra czy wczytywanie
-int gra(bool nowa)
+int gra(bool nowa)     // nowa - czy nowa gra czy wczytujemy                     (funkcja matka)
 {
     bool start = true;
-    int wybor;
+    int miejsceStartu;
     Gracz gracz1, gracz2;
     StanGry stanGry = StanGry();
     if(nowa)
@@ -747,7 +693,7 @@ int gra(bool nowa)
         wyswietlPlansze(&gracz1, &gracz2);
         kolejnosc(stanGry.turaGracza1);
 
-        if(wybierzPole(&gracz1, &gracz2, &stanGry) == 0)
+        if(wybierzPoleStartowe(&gracz1, &gracz2, &stanGry) == 0)
             return zapisz(&gracz1, &gracz2, &stanGry);
         if(stanGry.pozostaleRuchy == 0 || stanGry.pas)
         {
