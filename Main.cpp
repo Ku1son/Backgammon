@@ -18,6 +18,8 @@ extern "C" {
 struct Drabiny {
 	int x[8];
 	int y[8];
+	int xx[8];
+	int yy[8];
 
 	Drabiny(int nrMapy)
 	{
@@ -61,6 +63,32 @@ struct Drabiny {
 					break;
 				}
 			}
+			for (int i = 0; i < 8; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					xx[i] = 70;
+					yy[i] = 700;
+					break;
+				case 1:
+					xx[i] = 130;
+					yy[i] = 600;
+					break;
+				case 2:
+					xx[i] = 70;
+					yy[i] = 500;
+					break;
+				case 3:
+					xx[i] = 130;
+					yy[i] = 400;
+					break;
+				case 4:
+					xx[i] = 70;
+					yy[i] = 300;
+					break;
+				}
+			}
 		}
 		else if (nrMapy == 2)
 		{
@@ -95,6 +123,53 @@ struct Mario {
 		SpeedMultiplier = 300.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
+	}
+	void addX(double delta)
+	{
+		X += SpeedX * SpeedMultiplier * delta;
+	}
+	void addY(double delta)
+	{
+		Y += SpeedY * SpeedMultiplier * delta;
+	}
+
+	void ruchX(double wartosc)
+	{
+		SpeedX = wartosc;
+	}
+	void ruchY(double wartosc)
+	{
+		SpeedY = wartosc;
+	}
+
+};
+
+struct Barrel {
+	double SpeedMultiplier;  // Mnożnik prędkości Mario
+	double SpeedX;
+	double SpeedY;
+	double X;
+	double Y;
+	bool moveRight = true;
+
+
+	Barrel()
+	{
+		X = 900;
+		Y = 282;
+		//X = 200;
+		//Y = 600;
+		SpeedMultiplier = 500.0;
+		SpeedX = 0.0;
+		SpeedY = 0.0;
+	}
+	void restart()
+	{
+		X = 900;
+		Y = 282;
+		SpeedMultiplier = 500.0;
+		SpeedX = 0.0;
+		SpeedY = 0.0;
 
 	}
 	void addX(double delta)
@@ -116,48 +191,36 @@ struct Mario {
 	}
 };
 
-struct Barrel {
-	double SpeedMultiplier;  // Mnożnik prędkości Mario
-	double SpeedX;
-	double SpeedY;
+struct Monkey {
 	double X;
 	double Y;
-	bool moveRight = false;
 
-	Barrel()
+	Monkey()
 	{
-		X = 900;
+		X = 830;
 		Y = 282;
-		SpeedMultiplier = 300.0;
-		SpeedX = 0.0;
-		SpeedY = 0.0;
 	}
-	void restart()
-	{
-		X = 900;
-		Y = 282;
-		SpeedMultiplier = 300.0;
-		SpeedX = 0.0;
-		SpeedY = 0.0;
+	//void restart()
+	//{
+	//	X = 830;
+	//	Y = 282;
+	//}
+};
 
-	}
-	void addX(double delta)
-	{
-		X += SpeedX * SpeedMultiplier * delta;
-	}
-	void addY(double delta)
-	{
-		Y += SpeedY * SpeedMultiplier * delta;
-	}
+struct Princess {
+	double X;
+	double Y;
 
-	void ruchX(double wartosc)
+	Princess()
 	{
-		SpeedX = wartosc;
+		X = 720;
+		Y = 276;
 	}
-	void ruchY(double wartosc)
-	{
-		SpeedY = wartosc;
-	}
+	//void restart()
+	//{
+	//	X = 830;
+	//	Y = 282;
+	//}
 };
 
 
@@ -185,8 +248,6 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
 		text++;
 	};
 };
-
-
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) (x, y) to punkt srodka obrazka sprite na ekranie
 void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
 	SDL_Rect dest;
@@ -196,16 +257,11 @@ void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
 	dest.h = sprite->h;
 	SDL_BlitSurface(sprite, NULL, screen, &dest);
 };
-
-
-
 void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color) {
 	int bpp = surface->format->BytesPerPixel;
 	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 	*(Uint32*)p = color;
 };
-
-
 // rysowanie linii o d³ugoœci l w pionie (gdy dx = 0, dy = 1) b¹dŸ poziomie (gdy dx = 1, dy = 0)
 void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 color) {
 	for (int i = 0; i < l; i++) {
@@ -214,8 +270,6 @@ void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 c
 		y += dy;
 	};
 };
-
-
 // rysowanie prostok¹ta o d³ugoœci boków l i k
 void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 	Uint32 outlineColor, Uint32 fillColor) {
@@ -227,8 +281,9 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 	for (i = y + 1; i < y + k - 1; i++)
 		DrawLine(screen, x + 1, i, l - 2, 1, 0, fillColor);
 };
-
 // Funkcja do rysowania planszy w grze Donkey Konga
+
+
 void rysujPodloge(SDL_Surface* screen, int x, int y)
 {
 	int czarny = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
@@ -245,9 +300,12 @@ void rysujDrabine(SDL_Surface* screen, int x, int y)
 
 void rysujPlansze(SDL_Surface* screen, Drabiny mapa)
 {
-	for (int i = 700; i >= 300; i = i - 100)
+	// for (int i = 700; i >= 300; i = i - 100)
+	for (int j = 0; j < 5; j++)
+
 	{
-		rysujPodloge(screen, 100, i);
+		//rysujPodloge(screen, 100, i);
+		rysujPodloge(screen, mapa.xx[j], mapa.yy[j]);
 	}
 	for (int j = 0; j < 8; j++)
 	{
@@ -258,19 +316,19 @@ void rysujPlansze(SDL_Surface* screen, Drabiny mapa)
 
 
 bool kolizjaMarioDrabina(Mario mario, Drabiny mapa) {
-	for (int i = 0; i < 8; i++)
-	{
-		// Sprawdzamy, czy lewy górny róg Mario jest wewnątrz obszaru drabiny
+	int marioLeft = (mario.X - MARIO_WIDTH / 2);
+	int marioRight = (mario.X + MARIO_WIDTH / 2);
+	int marioTop = (mario.Y - DRABINA_HEIGHT + 110);
+	int marioBottom = (mario.Y + DRABINA_HEIGHT - 60);
 
-		if (mario.X >= mapa.x[i] && mario.X <= mapa.y[i] + DRABINA_WIDTH &&
-			mario.Y >= mapa.y[i] - 30 && mario.Y <= mapa.y[i] + DRABINA_HEIGHT + 30) {
-			return true;
-		}
+	for (int i = 0; i < 8; i++) {
+		int drabinaLeft = mapa.x[i];
+		int drabinaRight = mapa.x[i] + DRABINA_WIDTH;
+		int drabinaTop = mapa.y[i];
+		int drabinaBottom = mapa.y[i] + DRABINA_HEIGHT;
 
-		// Sprawdzamy, czy prawy górny róg Mario jest wewnątrz obszaru drabiny
-
-		if (mario.X + MARIO_WIDTH >= mapa.x[i] && mario.X + MARIO_WIDTH <= mapa.x[i] + DRABINA_WIDTH &&
-			mario.Y >= mapa.y[i] - 30 && mario.Y <= mapa.y[i] + DRABINA_HEIGHT + 30) {
+		if (marioRight >= drabinaLeft && marioLeft <= drabinaRight &&
+			marioBottom >= drabinaTop && marioTop <= drabinaBottom) {
 			return true;
 		}
 	}
@@ -298,6 +356,8 @@ int main(int argc, char** argv) {
 	Drabiny mapa[3] = { Drabiny(1), Drabiny(2), Drabiny(3) };
 	Mario mario = Mario();
 	Barrel barrel = Barrel();
+	Monkey monkey = Monkey();
+	Princess princess = Princess();
 
 
 
@@ -305,6 +365,8 @@ int main(int argc, char** argv) {
 	SDL_Surface* screen, * charset;
 	SDL_Surface* marioPNG;
 	SDL_Surface* barrelPNG;
+	SDL_Surface* monkeyPNG;
+	SDL_Surface* princessPNG;
 	SDL_Texture* scrtex;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -362,8 +424,8 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
-	SDL_SetColorKey(charset, true, 0x000000);
 
+	SDL_SetColorKey(charset, true, 0x000000);
 	marioPNG = SDL_LoadBMP("./mario.bmp");
 	if (marioPNG == NULL) {
 		printf("SDL_LoadBMP(mario.bmp) error: %s\n", SDL_GetError());
@@ -376,9 +438,11 @@ int main(int argc, char** argv) {
 		return 1;
 	};
 
-	charset = SDL_LoadBMP("./cs8x8.bmp");
-	if (charset == NULL) {
-		printf("SDL_LoadBMP(cs8x8.bmp) error: %s\n", SDL_GetError());
+	SDL_SetColorKey(charset, true, 0x000000);
+	barrelPNG = SDL_LoadBMP("./barrel.bmp");
+	if (barrelPNG == NULL) {
+		printf("SDL_LoadBMP(mario.bmp) error: %s\n", SDL_GetError());
+		SDL_FreeSurface(charset);
 		SDL_FreeSurface(screen);
 		SDL_DestroyTexture(scrtex);
 		SDL_DestroyWindow(window);
@@ -386,11 +450,24 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
-	SDL_SetColorKey(charset, true, 0x000000);
 
-	barrelPNG = SDL_LoadBMP("./barrel.bmp");
-	if (barrelPNG == NULL) {
-		printf("SDL_LoadBMP(mario.bmp) error: %s\n", SDL_GetError());
+	SDL_SetColorKey(charset, true, 0x000000);
+	monkeyPNG = SDL_LoadBMP("./monkey.bmp");
+	if (monkeyPNG == NULL) {
+		printf("SDL_LoadBMP(monkey.bmp) error: %s\n", SDL_GetError());
+		SDL_FreeSurface(charset);
+		SDL_FreeSurface(screen);
+		SDL_DestroyTexture(scrtex);
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+		SDL_Quit();
+		return 1;
+	};
+
+	SDL_SetColorKey(charset, true, 0x000000);
+	princessPNG = SDL_LoadBMP("./princess.bmp");
+	if (princessPNG == NULL) {
+		printf("SDL_LoadBMP(princess.bmp) error: %s\n", SDL_GetError());
 		SDL_FreeSurface(charset);
 		SDL_FreeSurface(screen);
 		SDL_DestroyTexture(scrtex);
@@ -427,6 +504,7 @@ int main(int argc, char** argv) {
 		worldTime += delta;
 
 
+		// TODO zamien w funkcje
 		if (barrel.moveRight) {
 			barrel.X += barrel.SpeedMultiplier * delta;
 		}
@@ -434,23 +512,21 @@ int main(int argc, char** argv) {
 			barrel.X -= barrel.SpeedMultiplier * delta;
 		}
 		if (barrel.X > 1000) {
-			barrel.Y += DRABINA_HEIGHT + 7;  // Przesunięcie beczki niżej
+			barrel.Y += DRABINA_HEIGHT + 7;
 
-			// Zmiana kierunku po wypełnieniu warunku
 			barrel.moveRight = false;
 
-			// Ustawienie pozycji na lewym krańcu ekranu
 			barrel.X = 1000;
 		}
 		else if (barrel.X < 100) {
-			barrel.Y += DRABINA_HEIGHT + 10;  // Przesunięcie beczki niżej
+			barrel.Y += DRABINA_HEIGHT + 10;
 
-			// Zmiana kierunku po wypełnieniu warunku
 			barrel.moveRight = true;
 
-			// Ustawienie pozycji na prawym krańcu ekranu
 			barrel.X = 100;
 		}
+		// TODO zamien w funkcje
+
 
 		SDL_FillRect(screen, NULL, czarny);
 
@@ -465,10 +541,10 @@ int main(int argc, char** argv) {
 
 		DrawSurface(screen, marioPNG, mario.X, mario.Y);
 		DrawSurface(screen, barrelPNG, barrel.X, barrel.Y);
+		DrawSurface(screen, monkeyPNG, monkey.X, monkey.Y);
+		DrawSurface(screen, princessPNG, princess.X, princess.Y);
 
-		//DrawSurface(screen, eti,
-			//SCREEN_WIDTH / 2 + sin(distance) * SCREEN_HEIGHT / 3,
-			//SCREEN_HEIGHT / 2 + cos(distance) * SCREEN_HEIGHT / 3);
+
 
 
 		fpsTimer += delta;
@@ -478,25 +554,19 @@ int main(int argc, char** argv) {
 			fpsTimer -= 0.5;
 		};
 
-		// tekst informacyjny / info text
 		DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, czerwony, niebieski);
-		//            "template for the second project, elapsed time = %.1lf s  %.0lf frames / s"
 		sprintf(text, "Szablon drugiego zadania, czas trwania = %.1lf s  %.0lf klatek / s", worldTime, fps);
 		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
-		//	      "Esc - exit, n - new game, \032 - faster, \033 - slower"
 		sprintf(text, "Esc - wyjscie, n - nowa gra, \032 - ruch w lewo, \033 - ruch w prawo");
 		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
 
-		//Wybieranie aktualnej mapy i rysowanie platform z drabinami
 		rysujPlansze(screen, mapa[wybranaMapa - 1]);
 
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
-		//		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 		SDL_RenderPresent(renderer);
 
 		//TODO: obsługa zmiany map przez zmienna wybranaMapa
-		// obsluga zdarzen (o ile jakies zaszly) 
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 			case SDL_KEYDOWN:
@@ -543,7 +613,7 @@ int main(int argc, char** argv) {
 		frames++;
 	};
 
-	// zwolnienie powierzchni / freeing all surfaces
+	// zwolnienie powierzchni 
 	SDL_FreeSurface(charset);
 	SDL_FreeSurface(screen);
 	SDL_DestroyTexture(scrtex);
@@ -552,4 +622,4 @@ int main(int argc, char** argv) {
 
 	SDL_Quit();
 	return 0;
-};
+}
