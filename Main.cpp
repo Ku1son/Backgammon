@@ -109,6 +109,7 @@ struct Mario {
 	double SpeedY;
 	double X;
 	double Y;
+	
 
 	Mario()
 	{
@@ -117,6 +118,7 @@ struct Mario {
 		SpeedMultiplier = 300.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
+		
 	}
 	void restart()
 	{
@@ -153,20 +155,22 @@ struct Barrel {
 	double X;
 	double Y;
 	bool moveRight = true;
+	
 
 	Barrel()
 	{
 		X = 900;
 		Y = 282;
-		SpeedMultiplier = 800.0;
+		SpeedMultiplier = 600.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
+		
 	}
 	void restart()
 	{
 		X = 900;
 		Y = 282;
-		SpeedMultiplier = 800.0;
+		SpeedMultiplier = 600.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -222,7 +226,33 @@ struct Princess {
 	//}
 };
 
+struct Heart {
+	double X[3];
+	double Y[3];
+	bool isActive[3];
 
+	Heart()
+	{
+		//X = 30;
+		//Y = 70;
+		for (int i = 0; i < 3; ++i) {
+			X[i] = 30 + i * 52;
+			Y[i] = 70;
+			isActive[i] = true;
+		}
+	}
+	void restart()
+	{
+		for (int i = 0; i < 3; ++i) {
+			isActive[i] = true;
+		}
+		for (int i = 0; i < 3; ++i) {
+			X[i] = 30 + i * 52;
+			Y[i] = 70;
+			isActive[i] = true;
+		}
+	}
+};
 
 // narysowanie napisu txt na powierzchni screen, zaczynaj¹c od punktu (x, y)
 // charset to bitmapa 128x128 zawieraj¹ca znaki
@@ -280,7 +310,6 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 	for (i = y + 1; i < y + k - 1; i++)
 		DrawLine(screen, x + 1, i, l - 2, 1, 0, fillColor);
 };
-// Funkcja do rysowania planszy w grze Donkey Konga
 
 
 void rysujPodloge(SDL_Surface* screen, int x, int y)
@@ -299,11 +328,8 @@ void rysujDrabine(SDL_Surface* screen, int x, int y)
 
 void rysujPlansze(SDL_Surface* screen, Drabiny mapa)
 {
-	// for (int i = 700; i >= 300; i = i - 100)
 	for (int j = 0; j < 5; j++)
-
 	{
-		//rysujPodloge(screen, 100, i);
 		rysujPodloge(screen, mapa.xx[j], mapa.yy[j]);
 	}
 	for (int j = 0; j < 8; j++)
@@ -334,8 +360,7 @@ bool kolizjaMarioDrabina(Mario mario, Drabiny mapa) {
 	return false;
 }
 
-bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {
-
+bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {	
 	int marioLeft = mario.X - MARIO_WIDTH / 2;
 	int marioRight = mario.X + MARIO_WIDTH / 2;
 	int marioTop = mario.Y - DRABINA_HEIGHT + 110;
@@ -352,8 +377,34 @@ bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {
 	}
 	return false;
 }
+bool deleteOnlyOneHeart(bool& flag) {
+	if (flag) {
+		flag = false;
+		return true;
+	}
+	return false;
+}
+void resetFlag(bool& flag) {
+	flag = true;
+}
 
+bool kolizjaMarioPrincess(Mario mario, Princess princess) {	// funkcja dziala TODO rezulat zderzenia
+	int marioLeft = mario.X - MARIO_WIDTH / 2;
+	int marioRight = mario.X + MARIO_WIDTH / 2;
+	int marioTop = mario.Y - DRABINA_HEIGHT + 110;
+	int marioBottom = mario.Y + DRABINA_HEIGHT - 60;
 
+	int princessLeft = princess.X;
+	int princessRight = princess.X + DRABINA_WIDTH;
+	int princessTop = princess.Y;
+	int princessBottom = princess.Y + DRABINA_HEIGHT;
+
+	if (marioRight >= princessLeft && marioLeft <= princessRight &&
+		marioBottom >= princessTop && marioTop <= princessBottom) {
+		return true;
+	}
+	return false;
+}
 
 
 // 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
@@ -366,6 +417,8 @@ int main(int argc, char** argv) {
 	int t1, t2, quit, frames, rc;
 	double worldTime, fpsTimer, fps, distance;
 	double delta;
+	bool flag = true;  // TODO nie moze byc zmiennej globalnej
+
 
 	//Dostepne mapy 1-3
 	int wybranaMapa = 1;
@@ -375,6 +428,7 @@ int main(int argc, char** argv) {
 	Barrel barrel = Barrel();
 	Monkey monkey = Monkey();
 	Princess princess = Princess();
+	Heart heart = Heart();
 
 
 
@@ -384,6 +438,7 @@ int main(int argc, char** argv) {
 	SDL_Surface* barrelPNG;
 	SDL_Surface* monkeyPNG;
 	SDL_Surface* princessPNG;
+	SDL_Surface* heartPNG;
 	SDL_Texture* scrtex;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -494,6 +549,19 @@ int main(int argc, char** argv) {
 		return 1;
 	};
 
+	SDL_SetColorKey(charset, true, 0x000000);
+	heartPNG = SDL_LoadBMP("./heart.bmp");
+	if (heartPNG == NULL) {
+		printf("SDL_LoadBMP(princess.bmp) error: %s\n", SDL_GetError());
+		SDL_FreeSurface(charset);
+		SDL_FreeSurface(screen);
+		SDL_DestroyTexture(scrtex);
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+		SDL_Quit();
+		return 1;
+	};
+
 	char text[128];
 	int czarny = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 	int zielony = SDL_MapRGB(screen->format, 0x00, 0xFF, 0x00);
@@ -524,6 +592,7 @@ int main(int argc, char** argv) {
 		// TODO zamien w funkcje
 		if (barrel.X > 980 && barrel.Y > 680) {
 			barrel.restart();
+			resetFlag(flag);
 		}
 		else {
 			if (barrel.moveRight) {
@@ -556,10 +625,25 @@ int main(int argc, char** argv) {
 		{
 			mario.ruchY(0.0);
 		}
-		if (kolizjaMarioBarrel(mario, barrel))
+
+		if (kolizjaMarioPrincess(mario, princess))
 		{
-			cout << "lige is good";
+			mario.restart();
+			barrel.restart();
 		}
+
+		if (kolizjaMarioBarrel(mario, barrel)) {
+			if (deleteOnlyOneHeart(flag)) {
+				for (int i = 2; i >= 0; --i) {
+					if (heart.isActive[i]) {
+						heart.isActive[i] = false;
+						break;
+					}
+				}
+			}
+		}
+
+
 
 		mario.addX(delta);
 		mario.addY(delta);
@@ -568,7 +652,11 @@ int main(int argc, char** argv) {
 		DrawSurface(screen, barrelPNG, barrel.X, barrel.Y);
 		DrawSurface(screen, monkeyPNG, monkey.X, monkey.Y);
 		DrawSurface(screen, princessPNG, princess.X, princess.Y);
-
+		for (int i = 0; i < 3; ++i) {
+			if (heart.isActive[i]) {
+				DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
+			}
+		}
 
 
 
