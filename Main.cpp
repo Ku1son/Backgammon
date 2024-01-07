@@ -2,6 +2,8 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
+#include <iostream>
+using namespace std;
 
 extern "C" {
 #include"./SDL2-2.0.10/include/SDL.h"
@@ -152,14 +154,11 @@ struct Barrel {
 	double Y;
 	bool moveRight = true;
 
-
 	Barrel()
 	{
 		X = 900;
 		Y = 282;
-		//X = 200;
-		//Y = 600;
-		SpeedMultiplier = 500.0;
+		SpeedMultiplier = 800.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -167,10 +166,10 @@ struct Barrel {
 	{
 		X = 900;
 		Y = 282;
-		SpeedMultiplier = 500.0;
+		SpeedMultiplier = 800.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
-
+		moveRight = true;
 	}
 	void addX(double delta)
 	{
@@ -335,11 +334,29 @@ bool kolizjaMarioDrabina(Mario mario, Drabiny mapa) {
 	return false;
 }
 
+bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {
+
+	int marioLeft = mario.X - MARIO_WIDTH / 2;
+	int marioRight = mario.X + MARIO_WIDTH / 2;
+	int marioTop = mario.Y - DRABINA_HEIGHT + 110;
+	int marioBottom = mario.Y + DRABINA_HEIGHT - 60;
+
+	int barrelLeft = barrel.X;
+	int barrelRight = barrel.X + DRABINA_WIDTH;
+	int barrelTop = barrel.Y;
+	int barrelBottom = barrel.Y + DRABINA_HEIGHT;
+
+	if (marioRight >= barrelLeft && marioLeft <= barrelRight &&
+		marioBottom >= barrelTop && marioTop <= barrelBottom) {
+		return true;
+	}
+	return false;
+}
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
 
 #ifdef __cplusplus
 extern "C"
@@ -492,7 +509,7 @@ int main(int argc, char** argv) {
 	worldTime = 0;
 	distance = 0;
 
-	while (!quit) {
+	while (!quit) {	// 222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
 		t2 = SDL_GetTicks();
 
 		// w tym momencie t2-t1 to czas w milisekundach,
@@ -505,25 +522,30 @@ int main(int argc, char** argv) {
 
 
 		// TODO zamien w funkcje
-		if (barrel.moveRight) {
-			barrel.X += barrel.SpeedMultiplier * delta;
+		if (barrel.X > 980 && barrel.Y > 680) {
+			barrel.restart();
 		}
 		else {
-			barrel.X -= barrel.SpeedMultiplier * delta;
-		}
-		if (barrel.X > 1000) {
-			barrel.Y += DRABINA_HEIGHT + 7;
+			if (barrel.moveRight) {
+				barrel.X += barrel.SpeedMultiplier * delta;
+			}
+			else {
+				barrel.X -= barrel.SpeedMultiplier * delta;
+			}
+			if (barrel.X > 1000) {
+				barrel.Y += DRABINA_HEIGHT + 7;
 
-			barrel.moveRight = false;
+				barrel.moveRight = false;
 
-			barrel.X = 1000;
-		}
-		else if (barrel.X < 100) {
-			barrel.Y += DRABINA_HEIGHT + 10;
+				barrel.X = 1000;
+			}
+			else if (barrel.X < 100) {
+				barrel.Y += DRABINA_HEIGHT + 10;
 
-			barrel.moveRight = true;
+				barrel.moveRight = true;
 
-			barrel.X = 100;
+				barrel.X = 100;
+			}
 		}
 		// TODO zamien w funkcje
 
@@ -534,7 +556,10 @@ int main(int argc, char** argv) {
 		{
 			mario.ruchY(0.0);
 		}
-
+		if (kolizjaMarioBarrel(mario, barrel))
+		{
+			cout << "lige is good";
+		}
 
 		mario.addX(delta);
 		mario.addY(delta);
