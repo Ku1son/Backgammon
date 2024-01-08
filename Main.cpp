@@ -22,8 +22,8 @@ struct Drabiny {
 	int y[8];
 	int xx[8];
 	int yy[8];
-	int podlogaP2X[1];  
-	int podlogaP2Y[1];  
+	int podlogaP3X[2];
+	int podlogaP3Y[2];
 
 	Drabiny(int nrMapy)
 	{
@@ -34,35 +34,35 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					x[i] = 550;
+					x[i] = 530;
 					y[i] = 610;
 					break;
 				case 1:
-					x[i] = 870;
-					y[i] = 610;
+					x[i] = 640;
+					y[i] = 510;
 					break;
 				case 2:
 					x[i] = 250;
 					y[i] = 510;
 					break;
 				case 3:
-					x[i] = 390;
+					x[i] = 250;
 					y[i] = 510;
 					break;
 				case 4:
-					x[i] = 700;
+					x[i] = 400;
 					y[i] = 410;
 					break;
 				case 5:
-					x[i] = 830;
+					x[i] = 750;
 					y[i] = 410;
 					break;
 				case 6:
-					x[i] = 270;
+					x[i] = 570;
 					y[i] = 310;
 					break;
 				case 7:
-					x[i] = 150;
+					x[i] = 200;
 					y[i] = 310;
 					break;
 				}
@@ -101,23 +101,23 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					x[i] = 300;
+					x[i] = 850;
 					y[i] = 610;
 					break;
 				case 1:
-					x[i] = 470;
+					x[i] = 850;
 					y[i] = 610;
 					break;
 				case 2:
-					x[i] = 150;
+					x[i] = 450;
 					y[i] = 510;
 					break;
 				case 3:
-					x[i] = 490;
+					x[i] = 450;
 					y[i] = 510;
 					break;
 				case 4:
-					x[i] = 700;
+					x[i] = 330;
 					y[i] = 410;
 					break;
 				case 5:
@@ -125,11 +125,11 @@ struct Drabiny {
 					y[i] = 410;
 					break;
 				case 6:
-					x[i] = 270;
+					x[i] = 630;
 					y[i] = 310;
 					break;
 				case 7:
-					x[i] = 150;
+					x[i] = 730;
 					y[i] = 310;
 					break;
 				}
@@ -160,12 +160,77 @@ struct Drabiny {
 					break;
 				}
 			}
-			podlogaP2X[0] = 130;
-			podlogaP2Y[0] = 200;
 		}
 		else if (nrMapy == 3)
 		{
-			//TODO: mapa3
+			for (int i = 0; i < 8; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					x[i] = 600;
+					y[i] = 610;
+					break;
+				case 1:
+					x[i] = 590;
+					y[i] = 110;
+					break;
+				case 2:
+					x[i] = 340;
+					y[i] = 510;
+					break;
+				case 3:
+					x[i] = 750;
+					y[i] = 510;
+					break;
+				case 4:
+					x[i] = 480;
+					y[i] = 410;
+					break;
+				case 5:
+					x[i] = 850;
+					y[i] = 410;
+					break;
+				case 6:
+					x[i] = 270;
+					y[i] = 210;
+					break;
+				case 7:
+					x[i] = 640;
+					y[i] = 310;
+					break;
+				}
+			}
+			for (int i = 0; i < 8; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					xx[i] = 70;
+					yy[i] = 700;
+					break;
+				case 1:
+					xx[i] = 130;
+					yy[i] = 600;
+					break;
+				case 2:
+					xx[i] = 70;
+					yy[i] = 500;
+					break;
+				case 3:
+					xx[i] = 130;
+					yy[i] = 400;
+					break;
+				case 4:
+					xx[i] = 70;
+					yy[i] = 300;
+					break;
+				}
+			}
+			podlogaP3X[0] = 130;
+			podlogaP3Y[0] = 200;
+			podlogaP3X[1] = 70;
+			podlogaP3Y[1] = 100;
 		}
 	}
 };
@@ -226,17 +291,17 @@ struct Barrel {
 
 	Barrel()
 	{
-		X = 900;
+		X = 140;
 		Y = 282;
-		SpeedMultiplier = 2000.0;	// przyspieszone do testow
+		SpeedMultiplier = 1000.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
 	void restart()
 	{
-		X = 900;
+		X = 140;
 		Y = 282;
-		SpeedMultiplier = 2000.0;	// przyspieszone do testow
+		SpeedMultiplier = 1000.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -266,7 +331,7 @@ struct Monkey {
 
 	Monkey()
 	{
-		X = 830;
+		X = 110;
 		Y = 282;
 	}
 	void restart()
@@ -281,7 +346,7 @@ struct Princess {
 
 	Princess()
 	{
-		X = 720;
+		X = 360;
 		Y = 276;
 	}
 	void restart()
@@ -398,8 +463,10 @@ void rysujPlansze(SDL_Surface* screen, Drabiny mapa, int &wybranaMapa)
 	{
 		rysujDrabine(screen, mapa.x[j], mapa.y[j]);
 	}
-	if (wybranaMapa == 2) {
-		rysujPodloge(screen, mapa.podlogaP2X[0], mapa.podlogaP2Y[0]);
+	if (wybranaMapa == 3) {
+		for (int i = 0; i < 2; i++) {
+			rysujPodloge(screen, mapa.podlogaP3X[i], mapa.podlogaP3Y[i]);
+		}
 	}
 }
 
