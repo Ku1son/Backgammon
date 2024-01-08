@@ -22,8 +22,8 @@ struct Drabiny {
 	int y[8];
 	int xx[8];
 	int yy[8];
-	int podlogaX[1];  
-	int podlogaY[1];  
+	int podlogaP2X[1];  
+	int podlogaP2Y[1];  
 
 	Drabiny(int nrMapy)
 	{
@@ -101,7 +101,7 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					x[i] = 200;
+					x[i] = 300;
 					y[i] = 610;
 					break;
 				case 1:
@@ -160,8 +160,8 @@ struct Drabiny {
 					break;
 				}
 			}
-			podlogaX[0] = 500;
-			podlogaY[0] = 690;
+			podlogaP2X[0] = 130;
+			podlogaP2Y[0] = 200;
 		}
 		else if (nrMapy == 3)
 		{
@@ -399,7 +399,7 @@ void rysujPlansze(SDL_Surface* screen, Drabiny mapa, int &wybranaMapa)
 		rysujDrabine(screen, mapa.x[j], mapa.y[j]);
 	}
 	if (wybranaMapa == 2) {
-		rysujPodloge(screen, mapa.podlogaX[0], mapa.podlogaY[0]);
+		rysujPodloge(screen, mapa.podlogaP2X[0], mapa.podlogaP2Y[0]);
 	}
 }
 
