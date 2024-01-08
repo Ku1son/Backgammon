@@ -22,6 +22,8 @@ struct Drabiny {
 	int y[8];
 	int xx[8];
 	int yy[8];
+	int podlogaX[1];  
+	int podlogaY[1];  
 
 	Drabiny(int nrMapy)
 	{
@@ -94,7 +96,72 @@ struct Drabiny {
 		}
 		else if (nrMapy == 2)
 		{
-			//TODO: mapa2
+			for (int i = 0; i < 8; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					x[i] = 200;
+					y[i] = 610;
+					break;
+				case 1:
+					x[i] = 470;
+					y[i] = 610;
+					break;
+				case 2:
+					x[i] = 150;
+					y[i] = 510;
+					break;
+				case 3:
+					x[i] = 490;
+					y[i] = 510;
+					break;
+				case 4:
+					x[i] = 700;
+					y[i] = 410;
+					break;
+				case 5:
+					x[i] = 830;
+					y[i] = 410;
+					break;
+				case 6:
+					x[i] = 270;
+					y[i] = 310;
+					break;
+				case 7:
+					x[i] = 150;
+					y[i] = 310;
+					break;
+				}
+			}
+			for (int i = 0; i < 8; i++)
+			{
+				switch (i)
+				{
+				case 0:
+					xx[i] = 70;
+					yy[i] = 700;
+					break;
+				case 1:
+					xx[i] = 130;
+					yy[i] = 600;
+					break;
+				case 2:
+					xx[i] = 70;
+					yy[i] = 500;
+					break;
+				case 3:
+					xx[i] = 130;
+					yy[i] = 400;
+					break;
+				case 4:
+					xx[i] = 70;
+					yy[i] = 300;
+					break;
+				}
+			}
+			podlogaX[0] = 500;
+			podlogaY[0] = 690;
 		}
 		else if (nrMapy == 3)
 		{
@@ -109,7 +176,7 @@ struct Mario {
 	double SpeedY;
 	double X;
 	double Y;
-	
+
 
 	Mario()
 	{
@@ -118,7 +185,7 @@ struct Mario {
 		SpeedMultiplier = 300.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
-		
+
 	}
 	void restart()
 	{
@@ -155,22 +222,21 @@ struct Barrel {
 	double X;
 	double Y;
 	bool moveRight = true;
-	
+
 
 	Barrel()
 	{
 		X = 900;
 		Y = 282;
-		SpeedMultiplier = 600.0;
+		SpeedMultiplier = 2000.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
-		
 	}
 	void restart()
 	{
 		X = 900;
 		Y = 282;
-		SpeedMultiplier = 600.0;
+		SpeedMultiplier = 2000.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -203,11 +269,10 @@ struct Monkey {
 		X = 830;
 		Y = 282;
 	}
-	//void restart()
-	//{
-	//	X = 830;
-	//	Y = 282;
-	//}
+	void restart()
+	{
+		// TODO chyba
+	}
 };
 
 struct Princess {
@@ -219,11 +284,10 @@ struct Princess {
 		X = 720;
 		Y = 276;
 	}
-	//void restart()
-	//{
-	//	X = 830;
-	//	Y = 282;
-	//}
+	void restart()
+	{
+		// TODO chyba
+	}
 };
 
 struct Heart {
@@ -233,8 +297,6 @@ struct Heart {
 
 	Heart()
 	{
-		//X = 30;
-		//Y = 70;
 		for (int i = 0; i < 3; ++i) {
 			X[i] = 30 + i * 52;
 			Y[i] = 70;
@@ -326,7 +388,7 @@ void rysujDrabine(SDL_Surface* screen, int x, int y)
 	DrawRectangle(screen, x, y, 5, 90, czarny, niebieski);
 }
 
-void rysujPlansze(SDL_Surface* screen, Drabiny mapa)
+void rysujPlansze(SDL_Surface* screen, Drabiny mapa, int &wybranaMapa)
 {
 	for (int j = 0; j < 5; j++)
 	{
@@ -336,9 +398,14 @@ void rysujPlansze(SDL_Surface* screen, Drabiny mapa)
 	{
 		rysujDrabine(screen, mapa.x[j], mapa.y[j]);
 	}
+	if (wybranaMapa == 2) {
+		rysujPodloge(screen, mapa.podlogaX[0], mapa.podlogaY[0]);
+	}
 }
 
-
+void timeRestart(double& worldTime) {
+	worldTime = 0;
+}
 
 bool kolizjaMarioDrabina(Mario mario, Drabiny mapa) {
 	int marioLeft = (mario.X - MARIO_WIDTH / 2);
@@ -360,7 +427,7 @@ bool kolizjaMarioDrabina(Mario mario, Drabiny mapa) {
 	return false;
 }
 
-bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {	
+bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {
 	int marioLeft = mario.X - MARIO_WIDTH / 2;
 	int marioRight = mario.X + MARIO_WIDTH / 2;
 	int marioTop = mario.Y - DRABINA_HEIGHT + 110;
@@ -405,6 +472,25 @@ bool kolizjaMarioPrincess(Mario mario, Princess princess) {	// funkcja dziala TO
 	}
 	return false;
 }
+
+bool isGameOver(Heart heart) {
+	for (int i = 0; i < 3; ++i) {
+		if (heart.isActive[i]) {
+			return false; 
+		}
+	}
+	return true; 
+}
+
+void gameOver(Mario &mario, Barrel &barrel, Heart &heart, double &worldTime, bool &flag) {	// TODO dodanie logiki gdy koniec gry (wyswietlenie menu)
+	mario.restart();
+	barrel.restart();
+	heart.restart();
+	timeRestart(worldTime);
+	resetFlag(flag);  // Dodaj reset flagi po restarcie gry
+}
+
+
 
 
 // 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
@@ -496,8 +582,8 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
-
 	SDL_SetColorKey(charset, true, 0x000000);
+
 	marioPNG = SDL_LoadBMP("./mario.bmp");
 	if (marioPNG == NULL) {
 		printf("SDL_LoadBMP(mario.bmp) error: %s\n", SDL_GetError());
@@ -510,7 +596,6 @@ int main(int argc, char** argv) {
 		return 1;
 	};
 
-	SDL_SetColorKey(charset, true, 0x000000);
 	barrelPNG = SDL_LoadBMP("./barrel.bmp");
 	if (barrelPNG == NULL) {
 		printf("SDL_LoadBMP(mario.bmp) error: %s\n", SDL_GetError());
@@ -523,7 +608,6 @@ int main(int argc, char** argv) {
 		return 1;
 	};
 
-	SDL_SetColorKey(charset, true, 0x000000);
 	monkeyPNG = SDL_LoadBMP("./monkey.bmp");
 	if (monkeyPNG == NULL) {
 		printf("SDL_LoadBMP(monkey.bmp) error: %s\n", SDL_GetError());
@@ -536,7 +620,6 @@ int main(int argc, char** argv) {
 		return 1;
 	};
 
-	SDL_SetColorKey(charset, true, 0x000000);
 	princessPNG = SDL_LoadBMP("./princess.bmp");
 	if (princessPNG == NULL) {
 		printf("SDL_LoadBMP(princess.bmp) error: %s\n", SDL_GetError());
@@ -549,7 +632,6 @@ int main(int argc, char** argv) {
 		return 1;
 	};
 
-	SDL_SetColorKey(charset, true, 0x000000);
 	heartPNG = SDL_LoadBMP("./heart.bmp");
 	if (heartPNG == NULL) {
 		printf("SDL_LoadBMP(princess.bmp) error: %s\n", SDL_GetError());
@@ -637,11 +719,16 @@ int main(int argc, char** argv) {
 				for (int i = 2; i >= 0; --i) {
 					if (heart.isActive[i]) {
 						heart.isActive[i] = false;
+						if (isGameOver(heart)) {
+							gameOver(mario, barrel, heart, worldTime, flag);
+						}
 						break;
 					}
 				}
 			}
 		}
+
+		
 
 
 
@@ -673,7 +760,7 @@ int main(int argc, char** argv) {
 		sprintf(text, "Esc - wyjscie, n - nowa gra, \032 - ruch w lewo, \033 - ruch w prawo");
 		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
 
-		rysujPlansze(screen, mapa[wybranaMapa - 1]);
+		rysujPlansze(screen, mapa[wybranaMapa - 1], wybranaMapa);
 
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
@@ -711,7 +798,20 @@ int main(int argc, char** argv) {
 				{
 					mario.restart();
 					barrel.restart();
+					heart.restart();
 					worldTime = 0;
+				}
+				else if (event.key.keysym.sym == SDLK_1) {
+					wybranaMapa = 1;
+					mapa[wybranaMapa - 1] = Drabiny(wybranaMapa);
+				}
+				else if (event.key.keysym.sym == SDLK_2) {
+					wybranaMapa = 2;
+					mapa[wybranaMapa - 1] = Drabiny(wybranaMapa);
+				}
+				else if (event.key.keysym.sym == SDLK_3) {
+					wybranaMapa = 3;
+					mapa[wybranaMapa - 1] = Drabiny(wybranaMapa);
 				}
 				break;
 			case SDL_KEYUP:
