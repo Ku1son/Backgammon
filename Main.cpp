@@ -17,15 +17,15 @@ extern "C" {
 #define MARIO_WIDTH 27
 
 
-struct Drabiny {
-	int x[8];
-	int y[8];
-	int xx[8];
-	int yy[8];
+struct Mapa {
+	int drabinaX[8];
+	int drabinaY[8];
+	int podlogaX[8];
+	int podlogaY[8];
 	int podlogaP3X[2];
 	int podlogaP3Y[2];
 
-	Drabiny(int nrMapy)
+	Mapa(int nrMapy)
 	{
 		if (nrMapy == 1)
 		{
@@ -34,36 +34,36 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					x[i] = 530;
-					y[i] = 610;
+					drabinaX[i] = 530;
+					drabinaY[i] = 610;
 					break;
 				case 1:
-					x[i] = 640;
-					y[i] = 510;
+					drabinaX[i] = 640;
+					drabinaY[i] = 510;
 					break;
 				case 2:
-					x[i] = 250;
-					y[i] = 510;
+					drabinaX[i] = 250;
+					drabinaY[i] = 510;
 					break;
 				case 3:
-					x[i] = 250;
-					y[i] = 510;
+					drabinaX[i] = 250;
+					drabinaY[i] = 510;
 					break;
 				case 4:
-					x[i] = 400;
-					y[i] = 410;
+					drabinaX[i] = 400;
+					drabinaY[i] = 410;
 					break;
 				case 5:
-					x[i] = 750;
-					y[i] = 410;
+					drabinaX[i] = 750;
+					drabinaY[i] = 410;
 					break;
 				case 6:
-					x[i] = 570;
-					y[i] = 310;
+					drabinaX[i] = 570;
+					drabinaY[i] = 310;
 					break;
 				case 7:
-					x[i] = 200;
-					y[i] = 310;
+					drabinaX[i] = 200;
+					drabinaY[i] = 310;
 					break;
 				}
 			}
@@ -72,24 +72,24 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					xx[i] = 70;
-					yy[i] = 700;
+					podlogaX[i] = 70;
+					podlogaY[i] = 700;
 					break;
 				case 1:
-					xx[i] = 130;
-					yy[i] = 600;
+					podlogaX[i] = 130;
+					podlogaY[i] = 600;
 					break;
 				case 2:
-					xx[i] = 70;
-					yy[i] = 500;
+					podlogaX[i] = 70;
+					podlogaY[i] = 500;
 					break;
 				case 3:
-					xx[i] = 130;
-					yy[i] = 400;
+					podlogaX[i] = 130;
+					podlogaY[i] = 400;
 					break;
 				case 4:
-					xx[i] = 70;
-					yy[i] = 300;
+					podlogaX[i] = 70;
+					podlogaY[i] = 300;
 					break;
 				}
 			}
@@ -101,36 +101,36 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					x[i] = 850;
-					y[i] = 610;
+					drabinaX[i] = 850;
+					drabinaY[i] = 610;
 					break;
 				case 1:
-					x[i] = 850;
-					y[i] = 610;
+					drabinaX[i] = 850;
+					drabinaY[i] = 610;
 					break;
 				case 2:
-					x[i] = 450;
-					y[i] = 510;
+					drabinaX[i] = 450;
+					drabinaY[i] = 510;
 					break;
 				case 3:
-					x[i] = 450;
-					y[i] = 510;
+					drabinaX[i] = 450;
+					drabinaY[i] = 510;
 					break;
 				case 4:
-					x[i] = 330;
-					y[i] = 410;
+					drabinaX[i] = 330;
+					drabinaY[i] = 410;
 					break;
 				case 5:
-					x[i] = 830;
-					y[i] = 410;
+					drabinaX[i] = 830;
+					drabinaY[i] = 410;
 					break;
 				case 6:
-					x[i] = 630;
-					y[i] = 310;
+					drabinaX[i] = 630;
+					drabinaY[i] = 310;
 					break;
 				case 7:
-					x[i] = 730;
-					y[i] = 310;
+					drabinaX[i] = 730;
+					drabinaY[i] = 310;
 					break;
 				}
 			}
@@ -139,24 +139,24 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					xx[i] = 70;
-					yy[i] = 700;
+					podlogaX[i] = 70;
+					podlogaY[i] = 700;
 					break;
 				case 1:
-					xx[i] = 130;
-					yy[i] = 600;
+					podlogaX[i] = 130;
+					podlogaY[i] = 600;
 					break;
 				case 2:
-					xx[i] = 70;
-					yy[i] = 500;
+					podlogaX[i] = 70;
+					podlogaY[i] = 500;
 					break;
 				case 3:
-					xx[i] = 130;
-					yy[i] = 400;
+					podlogaX[i] = 130;
+					podlogaY[i] = 400;
 					break;
 				case 4:
-					xx[i] = 70;
-					yy[i] = 300;
+					podlogaX[i] = 70;
+					podlogaY[i] = 300;
 					break;
 				}
 			}
@@ -168,36 +168,36 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					x[i] = 600;
-					y[i] = 610;
+					drabinaX[i] = 600;
+					drabinaY[i] = 610;
 					break;
 				case 1:
-					x[i] = 590;
-					y[i] = 110;
+					drabinaX[i] = 590;
+					drabinaY[i] = 110;
 					break;
 				case 2:
-					x[i] = 340;
-					y[i] = 510;
+					drabinaX[i] = 340;
+					drabinaY[i] = 510;
 					break;
 				case 3:
-					x[i] = 750;
-					y[i] = 510;
+					drabinaX[i] = 750;
+					drabinaY[i] = 510;
 					break;
 				case 4:
-					x[i] = 480;
-					y[i] = 410;
+					drabinaX[i] = 480;
+					drabinaY[i] = 410;
 					break;
 				case 5:
-					x[i] = 850;
-					y[i] = 410;
+					drabinaX[i] = 850;
+					drabinaY[i] = 410;
 					break;
 				case 6:
-					x[i] = 270;
-					y[i] = 210;
+					drabinaX[i] = 270;
+					drabinaY[i] = 210;
 					break;
 				case 7:
-					x[i] = 640;
-					y[i] = 310;
+					drabinaX[i] = 640;
+					drabinaY[i] = 310;
 					break;
 				}
 			}
@@ -206,24 +206,24 @@ struct Drabiny {
 				switch (i)
 				{
 				case 0:
-					xx[i] = 70;
-					yy[i] = 700;
+					podlogaX[i] = 70;
+					podlogaY[i] = 700;
 					break;
 				case 1:
-					xx[i] = 130;
-					yy[i] = 600;
+					podlogaX[i] = 130;
+					podlogaY[i] = 600;
 					break;
 				case 2:
-					xx[i] = 70;
-					yy[i] = 500;
+					podlogaX[i] = 70;
+					podlogaY[i] = 500;
 					break;
 				case 3:
-					xx[i] = 130;
-					yy[i] = 400;
+					podlogaX[i] = 130;
+					podlogaY[i] = 400;
 					break;
 				case 4:
-					xx[i] = 70;
-					yy[i] = 300;
+					podlogaX[i] = 70;
+					podlogaY[i] = 300;
 					break;
 				}
 			}
@@ -241,7 +241,6 @@ struct Mario {
 	double SpeedY;
 	double X;
 	double Y;
-
 
 	Mario()
 	{
@@ -268,7 +267,6 @@ struct Mario {
 	{
 		Y += SpeedY * SpeedMultiplier * delta;
 	}
-
 	void ruchX(double wartosc)
 	{
 		SpeedX = wartosc;
@@ -277,7 +275,22 @@ struct Mario {
 	{
 		SpeedY = wartosc;
 	}
-
+	void zapisz(FILE* plik)
+	{
+		fwrite(&SpeedMultiplier, sizeof(double), 1, plik);
+		fwrite(&SpeedX, sizeof(double), 1, plik);
+		fwrite(&SpeedY, sizeof(double), 1, plik);
+		fwrite(&X, sizeof(double), 1, plik);
+		fwrite(&Y, sizeof(double), 1, plik);
+	}
+	void wczytaj(FILE* plik)
+	{
+		fread(&SpeedMultiplier, sizeof(double), 1, plik);
+		fread(&SpeedX, sizeof(double), 1, plik);
+		fread(&SpeedY, sizeof(double), 1, plik);
+		fread(&X, sizeof(double), 1, plik);
+		fread(&Y, sizeof(double), 1, plik);
+	}
 };
 
 struct Barrel {
@@ -293,7 +306,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 1000.0;	// przyspieszone do testow
+		SpeedMultiplier = 500.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -301,7 +314,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 1000.0;	// przyspieszone do testow
+		SpeedMultiplier = 500.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -314,7 +327,6 @@ struct Barrel {
 	{
 		Y += SpeedY * SpeedMultiplier * delta;
 	}
-
 	void ruchX(double wartosc)
 	{
 		SpeedX = wartosc;
@@ -322,6 +334,24 @@ struct Barrel {
 	void ruchY(double wartosc)
 	{
 		SpeedY = wartosc;
+	}
+	void zapisz(FILE* plik)
+	{
+		fwrite(&SpeedMultiplier, sizeof(double), 1, plik);
+		fwrite(&SpeedX, sizeof(double), 1, plik);
+		fwrite(&SpeedY, sizeof(double), 1, plik);
+		fwrite(&X, sizeof(double), 1, plik);
+		fwrite(&Y, sizeof(double), 1, plik);
+		fwrite(&moveRight, sizeof(bool), 1, plik);
+	}
+	void wczytaj(FILE* plik)
+	{
+		fread(&SpeedMultiplier, sizeof(double), 1, plik);
+		fread(&SpeedX, sizeof(double), 1, plik);
+		fread(&SpeedY, sizeof(double), 1, plik);
+		fread(&X, sizeof(double), 1, plik);
+		fread(&Y, sizeof(double), 1, plik);
+		fread(&moveRight, sizeof(bool), 1, plik);
 	}
 };
 
@@ -338,6 +368,16 @@ struct Monkey {
 	{
 		// TODO chyba
 	}
+	void zapisz(FILE* plik)
+	{
+		fwrite(&X, sizeof(double), 1, plik);
+		fwrite(&Y, sizeof(double), 1, plik);
+	}
+	void wczytaj(FILE* plik)
+	{
+		fread(&X, sizeof(double), 1, plik);
+		fread(&Y, sizeof(double), 1, plik);
+	}
 };
 
 struct Princess {
@@ -352,6 +392,16 @@ struct Princess {
 	void restart()
 	{
 		// TODO chyba
+	}
+	void zapisz(FILE* plik)
+	{
+		fwrite(&X, sizeof(double), 1, plik);
+		fwrite(&Y, sizeof(double), 1, plik);
+	}
+	void wczytaj(FILE* plik)
+	{
+		fread(&X, sizeof(double), 1, plik);
+		fread(&Y, sizeof(double), 1, plik);
 	}
 };
 
@@ -379,7 +429,50 @@ struct Heart {
 			isActive[i] = true;
 		}
 	}
+	void zapisz(FILE* plik)
+	{
+		fwrite(X, sizeof(double), 3, plik);
+		fwrite(Y, sizeof(double), 3, plik);
+		fwrite(isActive, sizeof(bool), 3, plik);
+	}
+	void wczytaj(FILE* plik)
+	{
+		fread(X, sizeof(double), 3, plik);
+		fread(Y, sizeof(double), 3, plik);
+		fread(isActive, sizeof(bool), 3, plik);
+	}
 };
+
+void zapisGry(int nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
+{
+	const char* nazwaPliku = "zapis.bin";
+	FILE* plik = fopen(nazwaPliku, "wb");
+	if (!plik)
+		return;
+	fwrite(&nrMapy, sizeof(int), 1, plik);
+	mario->zapisz(plik);
+	barell->zapisz(plik);
+	monkey->zapisz(plik);
+	princess->zapisz(plik);
+	heart->zapisz(plik);
+	fclose(plik);
+}
+
+bool wczytanieGry(int* nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
+{
+	const char* nazwaPliku = "zapis.bin";
+	FILE* plik = fopen(nazwaPliku, "rb");
+	if (!plik)
+		return false;
+	fread(&nrMapy, sizeof(int), 1, plik);
+	mario->wczytaj(plik);
+	barell->wczytaj(plik);
+	monkey->wczytaj(plik);
+	princess->wczytaj(plik);
+	heart->wczytaj(plik);
+	fclose(plik);
+	return true;
+}
 
 // narysowanie napisu txt na powierzchni screen, zaczynaj¹c od punktu (x, y)
 // charset to bitmapa 128x128 zawieraj¹ca znaki
@@ -404,6 +497,7 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
 		text++;
 	};
 };
+
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) (x, y) to punkt srodka obrazka sprite na ekranie
 void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
 	SDL_Rect dest;
@@ -413,11 +507,13 @@ void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
 	dest.h = sprite->h;
 	SDL_BlitSurface(sprite, NULL, screen, &dest);
 };
+
 void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color) {
 	int bpp = surface->format->BytesPerPixel;
 	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 	*(Uint32*)p = color;
 };
+
 // rysowanie linii o d³ugoœci l w pionie (gdy dx = 0, dy = 1) b¹dŸ poziomie (gdy dx = 1, dy = 0)
 void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 color) {
 	for (int i = 0; i < l; i++) {
@@ -426,6 +522,7 @@ void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 c
 		y += dy;
 	};
 };
+
 // rysowanie prostok¹ta o d³ugoœci boków l i k
 void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 	Uint32 outlineColor, Uint32 fillColor) {
@@ -437,7 +534,6 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 	for (i = y + 1; i < y + k - 1; i++)
 		DrawLine(screen, x + 1, i, l - 2, 1, 0, fillColor);
 };
-
 
 void rysujPodloge(SDL_Surface* screen, int x, int y)
 {
@@ -453,15 +549,15 @@ void rysujDrabine(SDL_Surface* screen, int x, int y)
 	DrawRectangle(screen, x, y, 5, 90, czarny, niebieski);
 }
 
-void rysujPlansze(SDL_Surface* screen, Drabiny mapa, int &wybranaMapa)
+void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa)
 {
 	for (int j = 0; j < 5; j++)
 	{
-		rysujPodloge(screen, mapa.xx[j], mapa.yy[j]);
+		rysujPodloge(screen, mapa.podlogaX[j], mapa.podlogaY[j]);
 	}
 	for (int j = 0; j < 8; j++)
 	{
-		rysujDrabine(screen, mapa.x[j], mapa.y[j]);
+		rysujDrabine(screen, mapa.drabinaX[j], mapa.drabinaY[j]);
 	}
 	if (wybranaMapa == 3) {
 		for (int i = 0; i < 2; i++) {
@@ -474,17 +570,17 @@ void timeRestart(double& worldTime) {
 	worldTime = 0;
 }
 
-bool kolizjaMarioDrabina(Mario mario, Drabiny mapa) {
+bool kolizjaMarioDrabina(Mario mario, Mapa mapa) {
 	int marioLeft = (mario.X - MARIO_WIDTH / 2);
 	int marioRight = (mario.X + MARIO_WIDTH / 2);
 	int marioTop = (mario.Y - DRABINA_HEIGHT + 110);
 	int marioBottom = (mario.Y + DRABINA_HEIGHT - 60);
 
 	for (int i = 0; i < 8; i++) {
-		int drabinaLeft = mapa.x[i];
-		int drabinaRight = mapa.x[i] + DRABINA_WIDTH;
-		int drabinaTop = mapa.y[i];
-		int drabinaBottom = mapa.y[i] + DRABINA_HEIGHT;
+		int drabinaLeft = mapa.drabinaX[i];
+		int drabinaRight = mapa.drabinaX[i] + DRABINA_WIDTH;
+		int drabinaTop = mapa.drabinaY[i];
+		int drabinaBottom = mapa.drabinaY[i] + DRABINA_HEIGHT;
 
 		if (marioRight >= drabinaLeft && marioLeft <= drabinaRight &&
 			marioBottom >= drabinaTop && marioTop <= drabinaBottom) {
@@ -542,23 +638,19 @@ bool kolizjaMarioPrincess(Mario mario, Princess princess) {	// funkcja dziala TO
 
 bool isGameOver(Heart heart) {
 	for (int i = 0; i < 3; ++i) {
-		if (heart.isActive[i]) {
-			return false; 
-		}
+		if (heart.isActive[i])
+			return false;
 	}
-	return true; 
+	return true;
 }
 
-void gameOver(Mario &mario, Barrel &barrel, Heart &heart, double &worldTime, bool &flag) {	// TODO dodanie logiki gdy koniec gry (wyswietlenie menu)
+void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, bool& flag) {	// TODO dodanie logiki gdy koniec gry (wyswietlenie menu)
 	mario.restart();
 	barrel.restart();
 	heart.restart();
 	timeRestart(worldTime);
 	resetFlag(flag);  // Dodaj reset flagi po restarcie gry
 }
-
-
-
 
 // 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
 
@@ -570,20 +662,18 @@ int main(int argc, char** argv) {
 	int t1, t2, quit, frames, rc;
 	double worldTime, fpsTimer, fps, distance;
 	double delta;
-	bool flag = true;  // TODO nie moze byc zmiennej globalnej
-
+	bool flag = true;
+	const char* tytul = "```  KING DONKEY  '''";
 
 	//Dostepne mapy 1-3
 	int wybranaMapa = 1;
 
-	Drabiny mapa[3] = { Drabiny(1), Drabiny(2), Drabiny(3) };
+	Mapa mapa[3] = { Mapa(1), Mapa(2), Mapa(3) };
 	Mario mario = Mario();
 	Barrel barrel = Barrel();
 	Monkey monkey = Monkey();
 	Princess princess = Princess();
 	Heart heart = Heart();
-
-
 
 	SDL_Event event;
 	SDL_Surface* screen, * charset;
@@ -726,170 +816,268 @@ int main(int argc, char** argv) {
 	worldTime = 0;
 	distance = 0;
 
+	//zmienne stanu gry
+	char* menu[] = { "Nowa gra", "Zapisz gre", "Wczytaj gre", "Wyniki", "Wybor etapu", "Wyjscie" };
+	int iloscElementowMenu = 6, wybranyElement = 0;
+	char strzalka;
+	bool trybMenu = true, trwaGra = false, bladOdczytu = false;
+
 	while (!quit) {	// 222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
-		t2 = SDL_GetTicks();
-
-		// w tym momencie t2-t1 to czas w milisekundach,
-		// jaki uplynal od ostatniego narysowania ekranu
-		// delta to ten sam czas w sekundach
-		delta = (t2 - t1) * 0.001;
-		t1 = t2;
-
-		worldTime += delta;
-
-
-		// TODO zamien w funkcje
-		if (barrel.X > 980 && barrel.Y > 680) {
-			barrel.restart();
-			resetFlag(flag);
-		}
-		else {
-			if (barrel.moveRight) {
-				barrel.X += barrel.SpeedMultiplier * delta;
-			}
-			else {
-				barrel.X -= barrel.SpeedMultiplier * delta;
-			}
-			if (barrel.X > 1000) {
-				barrel.Y += DRABINA_HEIGHT + 7;
-
-				barrel.moveRight = false;
-
-				barrel.X = 1000;
-			}
-			else if (barrel.X < 100) {
-				barrel.Y += DRABINA_HEIGHT + 10;
-
-				barrel.moveRight = true;
-
-				barrel.X = 100;
-			}
-		}
-		// TODO zamien w funkcje
-
 
 		SDL_FillRect(screen, NULL, czarny);
 
-		if (!kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
+		// ======================= Menu glowne ======================= //
+		if (trybMenu == true)
 		{
-			mario.ruchY(0.0);
-		}
+			DrawString(screen, screen->w / 2 - strlen(tytul) * 8 / 2, screen->h / 5, tytul, charset);
 
-		if (kolizjaMarioPrincess(mario, princess))
-		{
-			mario.restart();
-			barrel.restart();
-		}
+			if (!trwaGra)
+			{
+				sprintf(text, "Brak trwajacej gry");
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 5 + 30, text, charset);
+			}
+			if (bladOdczytu)
+			{
+				sprintf(text, "Nie udalo sie wczytac zapisu");
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 5 + 40, text, charset);
+			}
 
-		if (kolizjaMarioBarrel(mario, barrel)) {
-			if (deleteOnlyOneHeart(flag)) {
-				for (int i = 2; i >= 0; --i) {
-					if (heart.isActive[i]) {
-						heart.isActive[i] = false;
-						if (isGameOver(heart)) {
-							gameOver(mario, barrel, heart, worldTime, flag);
+			for (int i = 0; i < iloscElementowMenu; i++)
+			{
+				if (i == wybranyElement)
+					sprintf(text, "---> %s <---", menu[i]);
+				else
+					sprintf(text, menu[i]);
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + i * 15, text, charset);
+			}
+
+			while (SDL_PollEvent(&event)) {
+				switch (event.type) {
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
+					else if (event.key.keysym.sym == SDLK_UP)
+					{
+						wybranyElement--;
+						if (wybranyElement == -1)
+							wybranyElement = iloscElementowMenu - 1;
+					}
+					else if (event.key.keysym.sym == SDLK_DOWN)
+					{
+						wybranyElement++;
+						if (wybranyElement == iloscElementowMenu)
+							wybranyElement = 0;
+					}
+					else if (event.key.keysym.sym == SDLK_RETURN)
+					{
+						bladOdczytu = false;
+						//Wybor opcji z menu  "Nowa gra", "Wczytaj gre", "Wyniki", "Wybor etapu", "Wyjscie" };
+						switch (wybranyElement)
+						{
+						case 0: //Nowa gra
+							mario.restart();
+							barrel.restart();
+							heart.restart();
+							worldTime = 0;
+							trybMenu = false;
+							trwaGra = true;
+							break;
+						case 1://Zapisz gre
+							if (trwaGra)
+							{
+								zapisGry(wybranaMapa, &mario, &barrel, &monkey, &princess, &heart);
+								trwaGra = false;
+							}
+							break;
+						case 2://Wczytaj gre
+							if (wczytanieGry(&wybranaMapa, &mario, &barrel, &monkey, &princess, &heart))
+							{
+								worldTime = 0;
+								trybMenu = false;
+								trwaGra = true;
+							}
+							else
+								bladOdczytu = true;
+							break;
+						case 3://Wyniki
+
+							break;
+						case 4://Wybor etapu
+
+							break;
+						case 5://Wyjscie
+							quit = 1;
+							break;
 						}
-						break;
+					}
+					break;
+				case SDL_QUIT:
+					quit = 1;
+					break;
+				};
+			};
+		}
+		// ========================= Gra ========================= //
+		else if (trybMenu == false)
+		{
+			t2 = SDL_GetTicks();
+
+			// w tym momencie t2-t1 to czas w milisekundach,
+			// jaki uplynal od ostatniego narysowania ekranu
+			// delta to ten sam czas w sekundach
+			delta = (t2 - t1) * 0.001;
+			t1 = t2;
+
+			worldTime += delta;
+
+			// TODO zamien w funkcje
+			if (barrel.X > 980 && barrel.Y > 680) {
+				barrel.restart();
+				resetFlag(flag);
+			}
+			else {
+				if (barrel.moveRight) {
+					barrel.X += barrel.SpeedMultiplier * delta;
+				}
+				else {
+					barrel.X -= barrel.SpeedMultiplier * delta;
+				}
+				if (barrel.X > 1000) {
+					barrel.Y += DRABINA_HEIGHT + 7;
+
+					barrel.moveRight = false;
+
+					barrel.X = 1000;
+				}
+				else if (barrel.X < 100) {
+					barrel.Y += DRABINA_HEIGHT + 10;
+
+					barrel.moveRight = true;
+
+					barrel.X = 100;
+				}
+			}
+
+			if (!kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
+			{
+				mario.ruchY(0.0);
+			}
+
+			if (kolizjaMarioPrincess(mario, princess))
+			{
+				if (wybranaMapa < 3)
+					wybranaMapa++;
+				else
+				{
+					//TODO koniec gry
+				}
+				mario.restart();
+				barrel.restart();
+			}
+
+			if (kolizjaMarioBarrel(mario, barrel)) {
+				if (deleteOnlyOneHeart(flag)) {
+					for (int i = 2; i >= 0; --i) {
+						if (heart.isActive[i]) {
+							heart.isActive[i] = false;
+							if (isGameOver(heart)) {
+								gameOver(mario, barrel, heart, worldTime, flag);
+							}
+							break;
+						}
 					}
 				}
 			}
-		}
 
-		
+			mario.addX(delta);
+			mario.addY(delta);
 
-
-
-		mario.addX(delta);
-		mario.addY(delta);
-
-		DrawSurface(screen, marioPNG, mario.X, mario.Y);
-		DrawSurface(screen, barrelPNG, barrel.X, barrel.Y);
-		DrawSurface(screen, monkeyPNG, monkey.X, monkey.Y);
-		DrawSurface(screen, princessPNG, princess.X, princess.Y);
-		for (int i = 0; i < 3; ++i) {
-			if (heart.isActive[i]) {
-				DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
+			DrawSurface(screen, marioPNG, mario.X, mario.Y);
+			DrawSurface(screen, barrelPNG, barrel.X, barrel.Y);
+			DrawSurface(screen, monkeyPNG, monkey.X, monkey.Y);
+			DrawSurface(screen, princessPNG, princess.X, princess.Y);
+			for (int i = 0; i < 3; ++i) {
+				if (heart.isActive[i]) {
+					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
+				}
 			}
+
+
+
+			fpsTimer += delta;
+			if (fpsTimer > 0.5) {
+				fps = frames * 2;
+				frames = 0;
+				fpsTimer -= 0.5;
+			};
+
+			DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, czerwony, niebieski);
+			sprintf(text, "Etap %d, czas trwania = %.1lf s  %.0lf klatek / s", wybranaMapa, worldTime, fps);
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
+			sprintf(text, "Esc - wyjscie, n - nowa gra, \032 - ruch w lewo, \033 - ruch w prawo");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
+
+			rysujPlansze(screen, mapa[wybranaMapa - 1], wybranaMapa);
+
+			while (SDL_PollEvent(&event)) {
+				switch (event.type) {
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE) trybMenu = true;
+					else if (event.key.keysym.sym == SDLK_LEFT)
+					{
+						if (!kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
+							mario.ruchX(-1.0);  // Ustaw prędkość ruchu Mario w lewo
+					}
+					else if (event.key.keysym.sym == SDLK_RIGHT) {
+						if (!kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
+							mario.ruchX(1.0);  // Ustaw prędkość ruchu Mario w prawo
+					}
+					else if (event.key.keysym.sym == SDLK_UP)
+					{
+						if (kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
+						{
+							mario.ruchY(-1.0);
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_DOWN)
+					{
+						if (kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
+						{
+							mario.ruchY(1.0);
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_n)
+					{
+						mario.restart();
+						barrel.restart();
+						heart.restart();
+						worldTime = 0;
+					}
+					else if (event.key.keysym.sym == SDLK_1) {
+						wybranaMapa = 1;
+						mapa[wybranaMapa - 1] = Mapa(wybranaMapa);
+					}
+					else if (event.key.keysym.sym == SDLK_2) {
+						wybranaMapa = 2;
+						mapa[wybranaMapa - 1] = Mapa(wybranaMapa);
+					}
+					else if (event.key.keysym.sym == SDLK_3) {
+						wybranaMapa = 3;
+						mapa[wybranaMapa - 1] = Mapa(wybranaMapa);
+					}
+					break;
+				case SDL_KEYUP:
+					mario.ruchY(0.0);
+					mario.ruchX(0.0);
+					break;
+				case SDL_QUIT:
+					quit = 1;
+					break;
+				};
+			};
 		}
-
-
-
-		fpsTimer += delta;
-		if (fpsTimer > 0.5) {
-			fps = frames * 2;
-			frames = 0;
-			fpsTimer -= 0.5;
-		};
-
-		DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, czerwony, niebieski);
-		sprintf(text, "Szablon drugiego zadania, czas trwania = %.1lf s  %.0lf klatek / s", worldTime, fps);
-		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
-		sprintf(text, "Esc - wyjscie, n - nowa gra, \032 - ruch w lewo, \033 - ruch w prawo");
-		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
-
-		rysujPlansze(screen, mapa[wybranaMapa - 1], wybranaMapa);
-
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 		SDL_RenderPresent(renderer);
-
-		//TODO: obsługa zmiany map przez zmienna wybranaMapa
-		while (SDL_PollEvent(&event)) {
-			switch (event.type) {
-			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
-				else if (event.key.keysym.sym == SDLK_LEFT)
-				{
-					if (!kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
-						mario.ruchX(-1.0);  // Ustaw prędkość ruchu Mario w lewo
-				}
-				else if (event.key.keysym.sym == SDLK_RIGHT) {
-					if (!kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
-						mario.ruchX(1.0);  // Ustaw prędkość ruchu Mario w prawo
-				}
-				else if (event.key.keysym.sym == SDLK_UP)
-				{
-					if (kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
-					{
-						mario.ruchY(-1.0);
-					}
-				}
-				else if (event.key.keysym.sym == SDLK_DOWN)
-				{
-					if (kolizjaMarioDrabina(mario, mapa[wybranaMapa - 1]))
-					{
-						mario.ruchY(1.0);
-					}
-				}
-				else if (event.key.keysym.sym == SDLK_n)
-				{
-					mario.restart();
-					barrel.restart();
-					heart.restart();
-					worldTime = 0;
-				}
-				else if (event.key.keysym.sym == SDLK_1) {
-					wybranaMapa = 1;
-					mapa[wybranaMapa - 1] = Drabiny(wybranaMapa);
-				}
-				else if (event.key.keysym.sym == SDLK_2) {
-					wybranaMapa = 2;
-					mapa[wybranaMapa - 1] = Drabiny(wybranaMapa);
-				}
-				else if (event.key.keysym.sym == SDLK_3) {
-					wybranaMapa = 3;
-					mapa[wybranaMapa - 1] = Drabiny(wybranaMapa);
-				}
-				break;
-			case SDL_KEYUP:
-				mario.ruchY(0.0);
-				mario.ruchX(0.0);
-				break;
-			case SDL_QUIT:
-				quit = 1;
-				break;
-			};
-		};
 		frames++;
 	};
 
