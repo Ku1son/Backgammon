@@ -443,12 +443,13 @@ struct Heart {
 	}
 };
 
-void zapisGry(int nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
+void zapisGry(double worldTime, int nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
 {
 	const char* nazwaPliku = "zapis.bin";
 	FILE* plik = fopen(nazwaPliku, "wb");
 	if (!plik)
 		return;
+	fwrite(&worldTime, sizeof(double), 1, plik);
 	fwrite(&nrMapy, sizeof(int), 1, plik);
 	mario->zapisz(plik);
 	barell->zapisz(plik);
@@ -458,12 +459,13 @@ void zapisGry(int nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess
 	fclose(plik);
 }
 
-bool wczytanieGry(int* nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
+bool wczytanieGry(double* worldTime, int* nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
 {
 	const char* nazwaPliku = "zapis.bin";
 	FILE* plik = fopen(nazwaPliku, "rb");
 	if (!plik)
 		return false;
+	fread(&worldTime, sizeof(double), 1, plik);
 	fread(&nrMapy, sizeof(int), 1, plik);
 	mario->wczytaj(plik);
 	barell->wczytaj(plik);
@@ -818,15 +820,16 @@ int main(int argc, char** argv) {
 
 	//zmienne stanu gry
 	char* menu[] = { "Nowa gra", "Zapisz gre", "Wczytaj gre", "Wyniki", "Wybor etapu", "Wyjscie" };
-	int iloscElementowMenu = 6, wybranyElement = 0;
+	int iloscElementowMenu = 6, wybranyElement = 0, wybrany = 1;
+
 	char strzalka;
-	bool trybMenu = true, trwaGra = false, bladOdczytu = false;
+	bool trybMenu = true, trwaGra = false, bladOdczytu = false, zbicie = false, wyborEtapu = false;
 
 	while (!quit) {	// 222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
 
 		SDL_FillRect(screen, NULL, czarny);
 
-		// ======================= Menu glowne ======================= //
+		// ========================== Menu glowne ========================== //
 		if (trybMenu == true)
 		{
 			DrawString(screen, screen->w / 2 - strlen(tytul) * 8 / 2, screen->h / 5, tytul, charset);
@@ -884,14 +887,13 @@ int main(int argc, char** argv) {
 						case 1://Zapisz gre
 							if (trwaGra)
 							{
-								zapisGry(wybranaMapa, &mario, &barrel, &monkey, &princess, &heart);
+								zapisGry(worldTime, wybranaMapa, &mario, &barrel, &monkey, &princess, &heart);
 								trwaGra = false;
 							}
 							break;
 						case 2://Wczytaj gre
-							if (wczytanieGry(&wybranaMapa, &mario, &barrel, &monkey, &princess, &heart))
+							if (wczytanieGry(&worldTime, &wybranaMapa, &mario, &barrel, &monkey, &princess, &heart))
 							{
-								worldTime = 0;
 								trybMenu = false;
 								trwaGra = true;
 							}
@@ -902,7 +904,8 @@ int main(int argc, char** argv) {
 
 							break;
 						case 4://Wybor etapu
-
+							trybMenu = false;
+							wyborEtapu = true;
 							break;
 						case 5://Wyjscie
 							quit = 1;
@@ -916,7 +919,104 @@ int main(int argc, char** argv) {
 				};
 			};
 		}
-		// ========================= Gra ========================= //
+		// ============================= Wybor etapu z menu ============================= //
+		else if (wyborEtapu == true)
+		{
+			sprintf(text, "Wybierz etap gry:");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 4, text, charset);
+			sprintf(text, "Wcisnij enter aby potwierdzic, lub escape zeby wrocic");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
+			for (int i = 1; i < 4; i++)
+			{
+				if (wybrany == i)
+					sprintf(text, "-->%d<--", i);
+				else
+					sprintf(text, "%d", i);
+				DrawString(screen, screen->w / 3 - strlen(text) * 8 / 2 + 88 * i, screen->h / 4 + 30, text, charset);
+			}
+
+			while (SDL_PollEvent(&event)) {
+				switch (event.type) {
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE)
+					{
+						wyborEtapu = false;
+						trybMenu = true;
+					}
+					else if (event.key.keysym.sym == SDLK_RIGHT)
+					{
+						wybrany++;
+						if (wybrany == 4)
+							wybrany = 1;
+					}
+					else if (event.key.keysym.sym == SDLK_LEFT)
+					{
+						wybrany--;
+						if (wybrany == 0)
+							wybrany = 3;
+					}
+					else if (event.key.keysym.sym == SDLK_RETURN)
+					{
+						mario.restart();
+						barrel.restart();
+						heart.restart();
+						worldTime = 0;
+						wybranaMapa = wybrany;
+						wyborEtapu = false;
+						trybMenu = false;
+						trwaGra = true;
+					}
+					break;
+				case SDL_QUIT:
+					quit = 1;
+					break;
+				};
+			};
+		}
+		// ========================= Informacja po utracie życia ========================= //
+		else if (zbicie == true)
+		{
+			for (int i = 0; i < 3; ++i) {
+				if (heart.isActive[i]) {
+					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
+				}
+			}
+
+			sprintf(text, "Utraciles zycie");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
+
+			if (isGameOver(heart))
+			{
+				sprintf(text, "żeby wyjsc nacisnij escape");
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
+				gameOver(mario, barrel, heart, worldTime, flag);
+			}
+			else
+			{
+				sprintf(text, "Jesli chcesz wrocic do gry wcisnij spacje,");
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
+				sprintf(text, "a jesli chcesz wyjsc to wcisnij escape");
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 30, text, charset);
+			}
+			while (SDL_PollEvent(&event)) {
+				switch (event.type) {
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE)
+					{
+						trwaGra = false;
+						trybMenu = true;
+						zbicie = false;
+					}
+					else if (event.key.keysym.sym == SDLK_SPACE)
+						zbicie = false;
+					break;
+				case SDL_QUIT:
+					quit = 1;
+					break;
+				};
+			};
+		}
+		// ====================================== Gra ====================================== //
 		else if (trybMenu == false)
 		{
 			t2 = SDL_GetTicks();
@@ -979,9 +1079,9 @@ int main(int argc, char** argv) {
 					for (int i = 2; i >= 0; --i) {
 						if (heart.isActive[i]) {
 							heart.isActive[i] = false;
-							if (isGameOver(heart)) {
-								gameOver(mario, barrel, heart, worldTime, flag);
-							}
+							zbicie = true;
+							mario.restart();
+							barrel.restart();
 							break;
 						}
 					}
