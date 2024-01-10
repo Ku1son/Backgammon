@@ -429,6 +429,16 @@ struct Heart {
 			isActive[i] = true;
 		}
 	}
+	int pozostaleSerca()
+	{
+		int n = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			if (isActive[i] == true)
+				n++;
+		}
+		return n;
+	}
 	void zapisz(FILE* plik)
 	{
 		fwrite(X, sizeof(double), 3, plik);
@@ -443,12 +453,13 @@ struct Heart {
 	}
 };
 
-void zapisGry(double worldTime, int nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
+void zapisGry(int ukonczonePoziomy, double worldTime, int nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
 {
 	const char* nazwaPliku = "zapis.bin";
 	FILE* plik = fopen(nazwaPliku, "wb");
 	if (!plik)
 		return;
+	fwrite(&ukonczonePoziomy, sizeof(int), 1, plik);
 	fwrite(&worldTime, sizeof(double), 1, plik);
 	fwrite(&nrMapy, sizeof(int), 1, plik);
 	mario->zapisz(plik);
@@ -459,12 +470,13 @@ void zapisGry(double worldTime, int nrMapy, Mario* mario, Barrel* barell, Monkey
 	fclose(plik);
 }
 
-bool wczytanieGry(double* worldTime, int* nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
+bool wczytanieGry(int* ukonczonePoziomy, double* worldTime, int* nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
 {
 	const char* nazwaPliku = "zapis.bin";
 	FILE* plik = fopen(nazwaPliku, "rb");
 	if (!plik)
 		return false;
+	fread(&ukonczonePoziomy, sizeof(int), 1, plik);
 	fread(&worldTime, sizeof(double), 1, plik);
 	fread(&nrMapy, sizeof(int), 1, plik);
 	mario->wczytaj(plik);
@@ -479,7 +491,8 @@ bool wczytanieGry(double* worldTime, int* nrMapy, Mario* mario, Barrel* barell, 
 // narysowanie napisu txt na powierzchni screen, zaczynaj¹c od punktu (x, y)
 // charset to bitmapa 128x128 zawieraj¹ca znaki
 void DrawString(SDL_Surface* screen, int x, int y, const char* text,
-	SDL_Surface* charset) {
+	SDL_Surface* charset)
+{
 	int px, py, c;
 	SDL_Rect s, d;
 	s.w = 8;
@@ -501,7 +514,8 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text,
 };
 
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) (x, y) to punkt srodka obrazka sprite na ekranie
-void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
+void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y)
+{
 	SDL_Rect dest;
 	dest.x = x - sprite->w / 2;
 	dest.y = y - sprite->h / 2;
@@ -510,14 +524,16 @@ void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y) {
 	SDL_BlitSurface(sprite, NULL, screen, &dest);
 };
 
-void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color) {
+void DrawPixel(SDL_Surface* surface, int x, int y, Uint32 color)
+{
 	int bpp = surface->format->BytesPerPixel;
 	Uint8* p = (Uint8*)surface->pixels + y * surface->pitch + x * bpp;
 	*(Uint32*)p = color;
 };
 
 // rysowanie linii o d³ugoœci l w pionie (gdy dx = 0, dy = 1) b¹dŸ poziomie (gdy dx = 1, dy = 0)
-void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 color) {
+void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 color)
+{
 	for (int i = 0; i < l; i++) {
 		DrawPixel(screen, x, y, color);
 		x += dx;
@@ -527,7 +543,8 @@ void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 c
 
 // rysowanie prostok¹ta o d³ugoœci boków l i k
 void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
-	Uint32 outlineColor, Uint32 fillColor) {
+	Uint32 outlineColor, Uint32 fillColor)
+{
 	int i;
 	DrawLine(screen, x, y, k, 0, 1, outlineColor);
 	DrawLine(screen, x + l - 1, y, k, 0, 1, outlineColor);
@@ -568,11 +585,13 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa)
 	}
 }
 
-void timeRestart(double& worldTime) {
+void timeRestart(double& worldTime)
+{
 	worldTime = 0;
 }
 
-bool kolizjaMarioDrabina(Mario mario, Mapa mapa) {
+bool kolizjaMarioDrabina(Mario mario, Mapa mapa)
+{
 	int marioLeft = (mario.X - MARIO_WIDTH / 2);
 	int marioRight = (mario.X + MARIO_WIDTH / 2);
 	int marioTop = (mario.Y - DRABINA_HEIGHT + 110);
@@ -592,7 +611,8 @@ bool kolizjaMarioDrabina(Mario mario, Mapa mapa) {
 	return false;
 }
 
-bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {
+bool kolizjaMarioBarrel(Mario mario, Barrel barrel)
+{
 	int marioLeft = mario.X - MARIO_WIDTH / 2;
 	int marioRight = mario.X + MARIO_WIDTH / 2;
 	int marioTop = mario.Y - DRABINA_HEIGHT + 110;
@@ -609,15 +629,22 @@ bool kolizjaMarioBarrel(Mario mario, Barrel barrel) {
 	}
 	return false;
 }
-bool deleteOnlyOneHeart(bool& flag) {
+bool deleteOnlyOneHeart(bool& flag)
+{
 	if (flag) {
 		flag = false;
 		return true;
 	}
 	return false;
 }
-void resetFlag(bool& flag) {
+void resetFlag(bool& flag)
+{
 	flag = true;
+}
+
+int liczPunkty(int zycia, int czas, int poziom)
+{
+	return 250 + 250 * zycia + 500 * poziom - (czas / 5) * 10;
 }
 
 bool kolizjaMarioPrincess(Mario mario, Princess princess) {	// funkcja dziala TODO rezulat zderzenia
@@ -661,7 +688,11 @@ extern "C"
 #endif
 
 int main(int argc, char** argv) {
-	int t1, t2, quit, frames, rc;
+	//punkty, 1000 na start
+	//-10 za 5 sekund w grze
+	//-250 za stratę życia, 
+	//+500 za poziom
+	int t1, t2, quit, frames, rc, punkty, ukonczonePoziomy;
 	double worldTime, fpsTimer, fps, distance;
 	double delta;
 	bool flag = true;
@@ -883,16 +914,17 @@ int main(int argc, char** argv) {
 							worldTime = 0;
 							trybMenu = false;
 							trwaGra = true;
+							ukonczonePoziomy = 0;
 							break;
 						case 1://Zapisz gre
 							if (trwaGra)
 							{
-								zapisGry(worldTime, wybranaMapa, &mario, &barrel, &monkey, &princess, &heart);
+								zapisGry(ukonczonePoziomy, worldTime, wybranaMapa, &mario, &barrel, &monkey, &princess, &heart);
 								trwaGra = false;
 							}
 							break;
 						case 2://Wczytaj gre
-							if (wczytanieGry(&worldTime, &wybranaMapa, &mario, &barrel, &monkey, &princess, &heart))
+							if (wczytanieGry(&ukonczonePoziomy, &worldTime, &wybranaMapa, &mario, &barrel, &monkey, &princess, &heart))
 							{
 								trybMenu = false;
 								trwaGra = true;
@@ -965,6 +997,7 @@ int main(int argc, char** argv) {
 						wyborEtapu = false;
 						trybMenu = false;
 						trwaGra = true;
+						ukonczonePoziomy = 0;
 					}
 					break;
 				case SDL_QUIT:
@@ -976,6 +1009,8 @@ int main(int argc, char** argv) {
 		// ========================= Informacja po utracie życia ========================= //
 		else if (zbicie == true)
 		{
+			punkty = liczPunkty(heart.pozostaleSerca(), (int)worldTime, ukonczonePoziomy);
+
 			for (int i = 0; i < 3; ++i) {
 				if (heart.isActive[i]) {
 					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
@@ -984,19 +1019,23 @@ int main(int argc, char** argv) {
 
 			sprintf(text, "Utraciles zycie");
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
+			sprintf(text, "zdobyte punkty: %d", punkty);
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
+			sprintf(text, "Zeby zapisac wynik wcisnij s");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 30, text, charset);
 
 			if (isGameOver(heart))
 			{
 				sprintf(text, "żeby wyjsc nacisnij escape");
-				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 45, text, charset);
 				gameOver(mario, barrel, heart, worldTime, flag);
 			}
 			else
 			{
 				sprintf(text, "Jesli chcesz wrocic do gry wcisnij spacje,");
-				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 45, text, charset);
 				sprintf(text, "a jesli chcesz wyjsc to wcisnij escape");
-				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 30, text, charset);
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 60, text, charset);
 			}
 			while (SDL_PollEvent(&event)) {
 				switch (event.type) {
@@ -1009,6 +1048,10 @@ int main(int argc, char** argv) {
 					}
 					else if (event.key.keysym.sym == SDLK_SPACE)
 						zbicie = false;
+					else if (event.key.keysym.sym == SDLK_s)
+					{
+						//TODO zapis wyniku
+					}
 					break;
 				case SDL_QUIT:
 					quit = 1;
@@ -1028,6 +1071,8 @@ int main(int argc, char** argv) {
 			t1 = t2;
 
 			worldTime += delta;
+
+			punkty = liczPunkty(heart.pozostaleSerca(), (int)worldTime, ukonczonePoziomy);
 
 			// TODO zamien w funkcje
 			if (barrel.X > 980 && barrel.Y > 680) {
@@ -1070,6 +1115,7 @@ int main(int argc, char** argv) {
 				{
 					//TODO koniec gry
 				}
+				ukonczonePoziomy++;
 				mario.restart();
 				barrel.restart();
 			}
@@ -1090,6 +1136,12 @@ int main(int argc, char** argv) {
 
 			mario.addX(delta);
 			mario.addY(delta);
+
+			sprintf(text, "%d", punkty);
+			if (punkty >= 1000) // if w celu poprawienia wygladu punktow
+				DrawString(screen, mario.X - 15, mario.Y - 30, text, charset);
+			else
+				DrawString(screen, mario.X - 10, mario.Y - 30, text, charset);
 
 			DrawSurface(screen, marioPNG, mario.X, mario.Y);
 			DrawSurface(screen, barrelPNG, barrel.X, barrel.Y);
