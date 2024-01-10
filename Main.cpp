@@ -2,8 +2,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
-#include <iostream>
-using namespace std;
+
 
 extern "C" {
 #include"./SDL2-2.0.10/include/SDL.h"
@@ -306,7 +305,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 500.0;	// przyspieszone do testow
+		SpeedMultiplier = 200.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -314,7 +313,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 500.0;	// przyspieszone do testow
+		SpeedMultiplier = 200.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -453,6 +452,31 @@ struct Heart {
 	}
 };
 
+struct Trophy {
+	double X;
+	double Y;
+
+	Trophy()
+	{
+		X = 120;
+		Y = 486;
+	}
+	void restart()
+	{
+		// TODO chyba
+	}
+	void zapisz(FILE* plik)
+	{
+		fwrite(&X, sizeof(double), 1, plik);
+		fwrite(&Y, sizeof(double), 1, plik);
+	}
+	void wczytaj(FILE* plik)
+	{
+		fread(&X, sizeof(double), 1, plik);
+		fread(&Y, sizeof(double), 1, plik);
+	}
+};
+
 void zapisGry(int ukonczonePoziomy, double worldTime, int nrMapy, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart)
 {
 	const char* nazwaPliku = "zapis.bin";
@@ -542,8 +566,7 @@ void DrawLine(SDL_Surface* screen, int x, int y, int l, int dx, int dy, Uint32 c
 };
 
 // rysowanie prostok¹ta o d³ugoœci boków l i k
-void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
-	Uint32 outlineColor, Uint32 fillColor)
+void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k, Uint32 outlineColor, Uint32 fillColor)
 {
 	int i;
 	DrawLine(screen, x, y, k, 0, 1, outlineColor);
@@ -678,10 +701,10 @@ void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, boo
 	barrel.restart();
 	heart.restart();
 	timeRestart(worldTime);
-	resetFlag(flag);  // Dodaj reset flagi po restarcie gry
+	resetFlag(flag);  
 }
 
-// 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+// 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
 
 #ifdef __cplusplus
 extern "C"
@@ -707,6 +730,7 @@ int main(int argc, char** argv) {
 	Monkey monkey = Monkey();
 	Princess princess = Princess();
 	Heart heart = Heart();
+	Trophy trophy = Trophy();
 
 	SDL_Event event;
 	SDL_Surface* screen, * charset;
@@ -715,6 +739,7 @@ int main(int argc, char** argv) {
 	SDL_Surface* monkeyPNG;
 	SDL_Surface* princessPNG;
 	SDL_Surface* heartPNG;
+	SDL_Surface* trophyPNG;
 	SDL_Texture* scrtex;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -833,6 +858,17 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
+	trophyPNG = SDL_LoadBMP("./trophy.bmp");
+	if (trophyPNG == NULL) {
+		printf("SDL_LoadBMP(trophy.bmp) error: %s\n", SDL_GetError());
+		SDL_FreeSurface(charset);
+		SDL_FreeSurface(screen);
+		SDL_DestroyTexture(scrtex);
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+		SDL_Quit();
+		return 1;
+	};
 
 	char text[128];
 	int czarny = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
@@ -856,7 +892,7 @@ int main(int argc, char** argv) {
 	char strzalka;
 	bool trybMenu = true, trwaGra = false, bladOdczytu = false, zbicie = false, wyborEtapu = false;
 
-	while (!quit) {	// 222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+	while (!quit) {	// 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
 
 		SDL_FillRect(screen, NULL, czarny);
 
@@ -1059,6 +1095,9 @@ int main(int argc, char** argv) {
 				};
 			};
 		}
+
+
+
 		// ====================================== Gra ====================================== //
 		else if (trybMenu == false)
 		{
@@ -1147,6 +1186,7 @@ int main(int argc, char** argv) {
 			DrawSurface(screen, barrelPNG, barrel.X, barrel.Y);
 			DrawSurface(screen, monkeyPNG, monkey.X, monkey.Y);
 			DrawSurface(screen, princessPNG, princess.X, princess.Y);
+			DrawSurface(screen, trophyPNG, trophy.X, trophy.Y);
 			for (int i = 0; i < 3; ++i) {
 				if (heart.isActive[i]) {
 					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
