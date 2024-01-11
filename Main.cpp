@@ -1093,7 +1093,6 @@ int main(int argc, char** argv) {
 			{
 				sprintf(text, "żeby wyjsc nacisnij escape");
 				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 45, text, charset);
-				gameOver(mario, barrel, heart, worldTime, flag);
 			}
 			else
 			{
@@ -1109,6 +1108,7 @@ int main(int argc, char** argv) {
 					{
 						stanGry.obecnyEtap = menu;
 						stanGry.trwaGra = false;
+						gameOver(mario, barrel, heart, worldTime, flag);
 					}
 					else if (event.key.keysym.sym == SDLK_SPACE)
 					{
