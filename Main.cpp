@@ -580,7 +580,7 @@ struct StanGry {
 };
 
 struct TabelaWynikow {
-	const char* nazwaPliku = "wyniki.bin";
+	const char* nazwaPliku = "wyniki";
 	char* nazwa;
 	int* punkty;
 	int strony;
@@ -588,7 +588,7 @@ struct TabelaWynikow {
 	TabelaWynikow()
 	{
 		int n, i = 0;
-		FILE* plik = fopen(nazwaPliku, "rb");
+		FILE* plik = fopen(nazwaPliku, "r");
 		if (!plik)
 		{
 			punkty = new int();
@@ -614,7 +614,7 @@ struct TabelaWynikow {
 	void wczytajWyniki()
 	{
 		int n, i = 0;
-		FILE* plik = fopen(nazwaPliku, "rb");
+		FILE* plik = fopen(nazwaPliku, "r");
 		if (!plik)
 		{
 			punkty = new int();
@@ -632,24 +632,26 @@ struct TabelaWynikow {
 			for (int i = 0; i < iloscWynikow; i++);
 			{
 				fread(&punkty[i * 10], sizeof(int), 1, plik);
-				fread(&nazwa[i * 10], sizeof(char[10]), 1, plik);
+				fread(&nazwa[i * 10], sizeof(char), strlen(&nazwa[i * 10]), plik);
 			}
 		}
 	}
 	void zapiszNowyWynik(char nazwaGracza[10], int pkt)
 	{
-		wczytajWyniki();
+		//wczytajWyniki();
 		int i = 0;
-		FILE* plik2 = fopen(nazwaPliku, "wb");
+		FILE* plik2 = fopen(nazwaPliku, "w");
 		int number = iloscWynikow + 1;
+
 		fwrite(&number, sizeof(int), 1, plik2);
+		/*
 		for (i = 0; i < iloscWynikow; i++);
 		{
 			fwrite(&punkty[i * 10], sizeof(int), 1, plik2);
 			fwrite(&nazwa[i * 10], sizeof(char[10]), 1, plik2);
 		}
 		fwrite(&pkt, sizeof(int), 1, plik2);
-		fwrite(nazwaGracza, sizeof(char[10]), 1, plik2);
+		fwrite(nazwaGracza, sizeof(char[10]), 1, plik2);*/
 		fclose(plik2);
 	}
 };
@@ -1016,13 +1018,7 @@ int main(int argc, char** argv) {
 	int iloscElementowMenu = 7, wybranyElement = 1, wybrany = 1;
 	char strzalka;
 
-	char test[10] = "test";
 	char nick[10] = "";
-
-	tabelaWynikow.zapiszNowyWynik(test, 100);
-	//tabelaWynikow.zapiszNowyWynik(test, 200);
-	//tabelaWynikow.zapiszNowyWynik(test, 159);
-	//tabelaWynikow.zapiszNowyWynik(test, 1329);
 
 	while (!quit) {	// 2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
 
@@ -1079,7 +1075,7 @@ int main(int argc, char** argv) {
 					else if (event.key.keysym.sym == SDLK_RETURN)
 					{
 						stanGry.bladOdczytu = false;
-						//Wybor opcji z menu "Wznow gre", "Nowa gra", "Zapisz gre", "Wczytaj gre", "Wyniki", "Wybor etapu", "Wyjscie" };
+						//Wybor opcji z menu "Wznow gre", "Nowa gra", "Zapisz gre", "Wczytaj gre", "Wyniki - WIP", "Wybor etapu", "Wyjscie" };
 						switch (wybranyElement)
 						{
 						case 0://wznow gre
