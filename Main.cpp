@@ -457,8 +457,8 @@ struct Princess {
 		fread(&X, sizeof(double), 1, plik);
 		fread(&Y, sizeof(double), 1, plik);
 	}
-	bool kolizja(Mario mario) 
-	{	
+	bool kolizja(Mario mario)
+	{
 		int marioLeft = mario.X - 13;
 		int marioRight = mario.X + 13;
 		int marioTop = mario.Y - 20;
@@ -834,12 +834,12 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa, Monkey& monk
 		monkey.Y = 282;
 		princess.X = 360;
 		princess.Y = 276;
-	/*	barrel.X = 140;				// DLATEGO CHCIALEM ZROBIC TA FUNKCJE MOVE BARREL
-		barrel.Y = 282;*/
+		/*	barrel.X = 140;				// DLATEGO CHCIALEM ZROBIC TA FUNKCJE MOVE BARREL
+			barrel.Y = 282;*/
 	}
-	if (wybranaMapa == 3) 
+	if (wybranaMapa == 3)
 	{
-		for (int i = 0; i < 2; i++) 
+		for (int i = 0; i < 2; i++)
 		{
 			rysujPodloge(screen, mapa.podlogaP3X[i], mapa.podlogaP3Y[i]);
 		}
@@ -847,40 +847,10 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa, Monkey& monk
 		monkey.Y = 80;
 		princess.X = 400;
 		princess.Y = 80;
-	/*	barrel.X = 230;		// ZEBY OPEROWAC NA WSKAZNIKACH ALE FUNKCJA MI NIE WYSZLA XD
-		barrel.Y = 80;*/
+		/*	barrel.X = 230;		// ZEBY OPEROWAC NA WSKAZNIKACH ALE FUNKCJA MI NIE WYSZLA XD
+			barrel.Y = 80;*/
 	}
 }
-
-//void moveBarrel(Barrel barrel, bool& flag, double& delta)
-//{
-//	if (barrel.X > 980 && barrel.Y > 680) {
-//		barrel.restart();
-//		resetFlag(flag);
-//	}
-//	else {
-//		if (barrel.moveRight) {
-//			barrel.X += barrel.SpeedMultiplier * delta;
-//		}
-//		else {
-//			barrel.X -= barrel.SpeedMultiplier * delta;
-//		}
-//		if (barrel.X > 1000) {
-//			barrel.Y += 100;
-//
-//			barrel.moveRight = false;
-//
-//			barrel.X = 1000;
-//		}
-//		else if (barrel.X < 100) {
-//			barrel.Y += 100;
-//
-//			barrel.moveRight = true;
-//
-//			barrel.X = 100;
-//		}
-//	}
-//}
 
 void timeRestart(double& worldTime)
 {
@@ -897,7 +867,7 @@ bool kolizjaMarioDrabina(Mario mario, Mapa mapa)
 	for (int i = 0; i < 8; i++) {
 		int drabinaLeft = mapa.drabinaX[i];
 		int drabinaRight = mapa.drabinaX[i] + 8;
-		int drabinaTop = mapa.drabinaY[i]-10;
+		int drabinaTop = mapa.drabinaY[i] - 10;
 		int drabinaBottom = mapa.drabinaY[i] + 50;
 
 		if (marioRight >= drabinaLeft && marioLeft <= drabinaRight &&
@@ -920,6 +890,36 @@ bool deleteOnlyOneHeart(bool& flag)
 void resetFlag(bool& flag)
 {
 	flag = true;
+}
+
+void moveBarrel(Barrel& barrel, bool& flag, double delta)
+{
+	if (barrel.X > 980 && barrel.Y > 680) {
+		barrel.restart();
+		resetFlag(flag);
+	}
+	else {
+		if (barrel.moveRight) {
+			barrel.X += barrel.SpeedMultiplier * delta;
+		}
+		else {
+			barrel.X -= barrel.SpeedMultiplier * delta;
+		}
+		if (barrel.X > 1000) {
+			barrel.Y += 100;
+
+			barrel.moveRight = false;
+
+			barrel.X = 1000;
+		}
+		else if (barrel.X < 100) {
+			barrel.Y += 100;
+
+			barrel.moveRight = true;
+
+			barrel.X = 100;
+		}
+	}
 }
 
 void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, bool& flag) {	// TODO dodanie logiki gdy koniec gry (wyswietlenie menu)
@@ -1420,41 +1420,15 @@ int main(int argc, char** argv) {
 			worldTime += delta;
 
 			stanGry.liczPunkty(heart.pozostaleSerca(), (int)worldTime);
-			// TODO zamien w funkcje
-			if (barrel.X > 980 && barrel.Y > 680) {
-				barrel.restart();
-				resetFlag(flag);
-			}
-			else {
-				if (barrel.moveRight) {
-					barrel.X += barrel.SpeedMultiplier * delta;
-				}
-				else {
-					barrel.X -= barrel.SpeedMultiplier * delta;
-				}
-				if (barrel.X > 1000) {
-					barrel.Y += 100;
 
-					barrel.moveRight = false;
-
-					barrel.X = 1000;
-				}
-				else if (barrel.X < 100) {
-					barrel.Y += 100;
-
-					barrel.moveRight = true;
-
-					barrel.X = 100;
-				}
-			}
-			//moveBarrel(barrel, flag, delta);
+			moveBarrel(barrel, flag, delta);
 
 			if (mario.skok)
 			{
 				mario.skokInterval(mapa[stanGry.wybranaMapa - 1]);
 			}
 
-			if (mario.naDrabinie)	
+			if (mario.naDrabinie)
 			{
 				if (!kolizjaMarioDrabina(mario, mapa[stanGry.wybranaMapa - 1])) {
 					mario.naDrabinie = false;
@@ -1542,7 +1516,7 @@ int main(int argc, char** argv) {
 					else if (event.key.keysym.sym == SDLK_SPACE)
 					{
 						//if (!mario.skok && !mario.naDrabinie)
-							if (!mario.skok)
+						if (!mario.skok)
 						{
 							mario.skok = true;
 						}
