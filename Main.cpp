@@ -2,6 +2,8 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
+#include <iostream>
+using namespace std;
 
 
 extern "C" {
@@ -30,6 +32,7 @@ struct Mapa {
 	int podlogaP3X[2];
 	int podlogaP3Y[2];
 
+
 	Mapa(int nrMapy)
 	{
 		if (nrMapy == 1)
@@ -44,10 +47,10 @@ struct Mapa {
 					break;
 				case 1:
 					drabinaX[i] = 640;
-					drabinaY[i] = 610;
+					drabinaY[i] = 510;
 					break;
 				case 2:
-					drabinaX[i] = 550;
+					drabinaX[i] = 250;
 					drabinaY[i] = 510;
 					break;
 				case 3:
@@ -343,7 +346,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 200.0;	// przyspieszone do testow
+		SpeedMultiplier = 100.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -351,7 +354,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 200.0;	// przyspieszone do testow
+		SpeedMultiplier = 100.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -454,7 +457,8 @@ struct Princess {
 		fread(&X, sizeof(double), 1, plik);
 		fread(&Y, sizeof(double), 1, plik);
 	}
-	bool kolizja(Mario mario) {	// funkcja dziala TODO rezulat zderzenia
+	bool kolizja(Mario mario) 
+	{	
 		int marioLeft = mario.X - 13;
 		int marioRight = mario.X + 13;
 		int marioTop = mario.Y - 20;
@@ -540,7 +544,7 @@ struct Trophy {
 		Y = 486;
 		active = true;
 	}
-	bool Kolizja(Mario mario)
+	bool kolizja(Mario mario)
 	{
 		if (active == false)
 			return false;
@@ -552,7 +556,7 @@ struct Trophy {
 
 		int trophyLeft = X - 20;
 		int trophyRight = X + 20;
-		int trophyTop = Y + 22;
+		int trophyTop = Y - 22;
 		int trophyBottom = Y + 22;
 
 		if (marioRight >= trophyLeft && marioLeft <= trophyRight &&
@@ -805,7 +809,7 @@ void rysujDrabine(SDL_Surface* screen, int x, int y)
 	DrawRectangle(screen, x, y, 8, 90, czarny, niebieski);
 }
 
-void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa)
+void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa, Monkey& monkey, Princess& princess, Barrel& barrel)
 {
 	for (int j = 0; j < 5; j++)
 	{
@@ -815,12 +819,68 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa)
 	{
 		rysujDrabine(screen, mapa.drabinaX[j], mapa.drabinaY[j]);
 	}
-	if (wybranaMapa == 3) {
-		for (int i = 0; i < 2; i++) {
+	if (wybranaMapa == 1)
+	{
+		monkey.X = 110;
+		monkey.Y = 282;
+		princess.X = 360;
+		princess.Y = 276;
+		/*barrel.X = 140;
+		barrel.Y = 282;	*/			// WTEDY SIE NIE RUSZA CHYBA WINA WSKAZNIKOW
+	}
+	if (wybranaMapa == 2)
+	{
+		monkey.X = 110;
+		monkey.Y = 282;
+		princess.X = 360;
+		princess.Y = 276;
+	/*	barrel.X = 140;				// DLATEGO CHCIALEM ZROBIC TA FUNKCJE MOVE BARREL
+		barrel.Y = 282;*/
+	}
+	if (wybranaMapa == 3) 
+	{
+		for (int i = 0; i < 2; i++) 
+		{
 			rysujPodloge(screen, mapa.podlogaP3X[i], mapa.podlogaP3Y[i]);
 		}
+		monkey.X = 200;
+		monkey.Y = 80;
+		princess.X = 400;
+		princess.Y = 80;
+	/*	barrel.X = 230;		// ZEBY OPEROWAC NA WSKAZNIKACH ALE FUNKCJA MI NIE WYSZLA XD
+		barrel.Y = 80;*/
 	}
 }
+
+//void moveBarrel(Barrel barrel, bool& flag, double& delta)
+//{
+//	if (barrel.X > 980 && barrel.Y > 680) {
+//		barrel.restart();
+//		resetFlag(flag);
+//	}
+//	else {
+//		if (barrel.moveRight) {
+//			barrel.X += barrel.SpeedMultiplier * delta;
+//		}
+//		else {
+//			barrel.X -= barrel.SpeedMultiplier * delta;
+//		}
+//		if (barrel.X > 1000) {
+//			barrel.Y += 100;
+//
+//			barrel.moveRight = false;
+//
+//			barrel.X = 1000;
+//		}
+//		else if (barrel.X < 100) {
+//			barrel.Y += 100;
+//
+//			barrel.moveRight = true;
+//
+//			barrel.X = 100;
+//		}
+//	}
+//}
 
 void timeRestart(double& worldTime)
 {
@@ -837,8 +897,8 @@ bool kolizjaMarioDrabina(Mario mario, Mapa mapa)
 	for (int i = 0; i < 8; i++) {
 		int drabinaLeft = mapa.drabinaX[i];
 		int drabinaRight = mapa.drabinaX[i] + 8;
-		int drabinaTop = mapa.drabinaY[i] - 10;
-		int drabinaBottom = mapa.drabinaY[i] + 90;
+		int drabinaTop = mapa.drabinaY[i]-10;
+		int drabinaBottom = mapa.drabinaY[i] + 50;
 
 		if (marioRight >= drabinaLeft && marioLeft <= drabinaRight &&
 			marioBottom >= drabinaTop && marioTop <= drabinaBottom) {
@@ -1345,11 +1405,12 @@ int main(int argc, char** argv) {
 				};
 			};
 		}
+
+
 		// ====================================== Gra ====================================== //
 		else if (stanGry.obecnyEtap = gra)
 		{
 			t2 = SDL_GetTicks();
-
 			// w tym momencie t2-t1 to czas w milisekundach,
 			// jaki uplynal od ostatniego narysowania ekranu
 			// delta to ten sam czas w sekundach
@@ -1359,13 +1420,6 @@ int main(int argc, char** argv) {
 			worldTime += delta;
 
 			stanGry.liczPunkty(heart.pozostaleSerca(), (int)worldTime);
-
-			if (mario.naDrabinie)
-			{
-				if (!kolizjaMarioDrabina(mario, mapa[stanGry.wybranaMapa]))
-					mario.naDrabinie = false;
-			}
-
 			// TODO zamien w funkcje
 			if (barrel.X > 980 && barrel.Y > 680) {
 				barrel.restart();
@@ -1393,13 +1447,19 @@ int main(int argc, char** argv) {
 					barrel.X = 100;
 				}
 			}
+			//moveBarrel(barrel, flag, delta);
+
 			if (mario.skok)
 			{
 				mario.skokInterval(mapa[stanGry.wybranaMapa - 1]);
 			}
-			if (!kolizjaMarioDrabina(mario, mapa[stanGry.wybranaMapa - 1]))
+
+			if (mario.naDrabinie)	
 			{
-				mario.ruchY(0.0);
+				if (!kolizjaMarioDrabina(mario, mapa[stanGry.wybranaMapa - 1])) {
+					mario.naDrabinie = false;
+					mario.ruchY(0.0);
+				}
 			}
 
 			if (princess.kolizja(mario))
@@ -1432,10 +1492,11 @@ int main(int argc, char** argv) {
 				}
 			}
 
-			if (trophy.Kolizja(mario))
+			if (trophy.kolizja(mario))
 			{
 				trophy.active = false;
 				stanGry.bonus++;
+				cout << "dziala";
 			}
 
 			mario.addX(delta);
@@ -1472,7 +1533,7 @@ int main(int argc, char** argv) {
 			sprintf(text, "Esc - wyjscie, n - nowa gra, \032 - ruch w lewo, \033 - ruch w prawo");
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
 
-			rysujPlansze(screen, mapa[stanGry.wybranaMapa - 1], stanGry.wybranaMapa);
+			rysujPlansze(screen, mapa[stanGry.wybranaMapa - 1], stanGry.wybranaMapa, monkey, princess, barrel);
 
 			while (SDL_PollEvent(&event)) {
 				switch (event.type) {
@@ -1480,7 +1541,8 @@ int main(int argc, char** argv) {
 					if (event.key.keysym.sym == SDLK_ESCAPE) stanGry.zmienEtap(menu);
 					else if (event.key.keysym.sym == SDLK_SPACE)
 					{
-						if (!mario.skok && !mario.naDrabinie)
+						//if (!mario.skok && !mario.naDrabinie)
+							if (!mario.skok)
 						{
 							mario.skok = true;
 						}
@@ -1525,14 +1587,17 @@ int main(int argc, char** argv) {
 					else if (event.key.keysym.sym == SDLK_1) {
 						stanGry.wybranaMapa = 1;
 						mapa[stanGry.wybranaMapa - 1] = Mapa(stanGry.wybranaMapa);
+						barrel.restart();
 					}
 					else if (event.key.keysym.sym == SDLK_2) {
 						stanGry.wybranaMapa = 2;
 						mapa[stanGry.wybranaMapa - 1] = Mapa(stanGry.wybranaMapa);
+						barrel.restart();
 					}
 					else if (event.key.keysym.sym == SDLK_3) {
 						stanGry.wybranaMapa = 3;
 						mapa[stanGry.wybranaMapa - 1] = Mapa(stanGry.wybranaMapa);
+						barrel.restart();
 					}
 					break;
 				case SDL_KEYUP:
