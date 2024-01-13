@@ -44,10 +44,10 @@ struct Mapa {
 					break;
 				case 1:
 					drabinaX[i] = 640;
-					drabinaY[i] = 510;
+					drabinaY[i] = 610;
 					break;
 				case 2:
-					drabinaX[i] = 250;
+					drabinaX[i] = 550;
 					drabinaY[i] = 510;
 					break;
 				case 3:
@@ -247,7 +247,8 @@ struct Mario {
 	double X;
 	double Y;
 	bool naDrabinie;
-
+	bool skok;
+	int klatkiSkoku;
 	Mario()
 	{
 		X = SCREEN_WIDTH / 5;
@@ -256,6 +257,8 @@ struct Mario {
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		naDrabinie = false;
+		skok = false;
+		klatkiSkoku = 200;
 	}
 	void restart()
 	{
@@ -265,6 +268,8 @@ struct Mario {
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		naDrabinie = false;
+		skok = false;
+		klatkiSkoku = 200;
 	}
 	void addX(double delta)
 	{
@@ -290,6 +295,8 @@ struct Mario {
 		fwrite(&X, sizeof(double), 1, plik);
 		fwrite(&Y, sizeof(double), 1, plik);
 		fwrite(&naDrabinie, sizeof(bool), 1, plik);
+		fwrite(&skok, sizeof(bool), 1, plik);
+		fwrite(&klatkiSkoku, sizeof(int), 1, plik);
 	}
 	void wczytaj(FILE* plik)
 	{
@@ -299,6 +306,28 @@ struct Mario {
 		fread(&X, sizeof(double), 1, plik);
 		fread(&Y, sizeof(double), 1, plik);
 		fread(&naDrabinie, sizeof(bool), 1, plik);
+		fread(&skok, sizeof(bool), 1, plik);
+		fread(&klatkiSkoku, sizeof(int), 1, plik);
+	}
+	void skokInterval(Mapa mapa)
+	{
+		if (klatkiSkoku > 0)
+		{
+			Y -= ((((double)klatkiSkoku / 20.0) - 5.0) / 1000.0) * SpeedMultiplier;
+			klatkiSkoku--;
+		}
+		if (klatkiSkoku == 0)
+		{
+			Y -= ((((double)klatkiSkoku / 20.0) - 5.0) / 1000.0) * SpeedMultiplier;
+			klatkiSkoku = 200;
+			skok = false;
+		}
+		for (int i = 0; i < 5; i++)
+		{
+			if (Y + 20 > mapa.podlogaY[i] && Y + 20 < mapa.podlogaY[i] + 10)
+				Y = mapa.podlogaY[i] - 20;
+		}
+
 	}
 };
 
@@ -549,6 +578,11 @@ struct StanGry {
 		obecnyEtap = menu;
 		trwaGra = bladOdczytu = false;
 		punkty = ukonczonePoziomy = bonus = 0;
+		//punkty, 1000 na start
+		//-10 za każde 2 sekundy w grze
+		//-250 za stratę życia, 
+		//+500 za poziom
+		//+100 za puchar
 	}
 	void nowaGra()
 	{
@@ -563,7 +597,7 @@ struct StanGry {
 	}
 	void liczPunkty(int zycia, int czas)
 	{
-		punkty = 250 + 250 * zycia + 500 * ukonczonePoziomy - (czas / 5) * 10 + 100 * bonus;
+		punkty = 250 + 250 * zycia + 500 * ukonczonePoziomy - (czas / 2) * 10 + 100 * bonus;
 	}
 	void zapisz(FILE* plik)
 	{
@@ -843,11 +877,7 @@ extern "C"
 #endif
 
 int main(int argc, char** argv) {
-	//punkty, 1000 na start
-	//-10 za 5 sekund w grze
-	//-250 za stratę życia, 
-	//+500 za poziom
-	//+100 za puchar
+
 	int t1, t2, quit, frames, rc;
 	double worldTime, fpsTimer, fps, distance;
 	double delta;
@@ -1184,12 +1214,12 @@ int main(int argc, char** argv) {
 				sprintf(text, "przelaczaj strony strzalkami");
 				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 6 + 15, text, charset);
 			}
-			for (int i = 0; i < 10 && i < tabelaWynikow.iloscWynikow; i++)
+			/*for (int i = 0; i < 10 && i < tabelaWynikow.iloscWynikow; i++)
 			{
 				sprintf(text, "%d     ", &tabelaWynikow.punkty[i]);
 				strcat(text, &tabelaWynikow.nazwa[i]);
 				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 4 + i * 10, text, charset);
-			}
+			}*/
 			while (SDL_PollEvent(&event)) {
 				switch (event.type) {
 				case SDL_KEYDOWN:
@@ -1363,7 +1393,10 @@ int main(int argc, char** argv) {
 					barrel.X = 100;
 				}
 			}
-
+			if (mario.skok)
+			{
+				mario.skokInterval(mapa[stanGry.wybranaMapa - 1]);
+			}
 			if (!kolizjaMarioDrabina(mario, mapa[stanGry.wybranaMapa - 1]))
 			{
 				mario.ruchY(0.0);
@@ -1445,6 +1478,13 @@ int main(int argc, char** argv) {
 				switch (event.type) {
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_ESCAPE) stanGry.zmienEtap(menu);
+					else if (event.key.keysym.sym == SDLK_SPACE)
+					{
+						if (!mario.skok && !mario.naDrabinie)
+						{
+							mario.skok = true;
+						}
+					}
 					else if (event.key.keysym.sym == SDLK_LEFT)
 					{
 						if (!mario.naDrabinie)
@@ -1460,6 +1500,11 @@ int main(int argc, char** argv) {
 						{
 							mario.ruchY(-1.0);
 							mario.naDrabinie = true;
+							if (mario.skok)
+							{
+								mario.skok = false;
+								mario.naDrabinie = 200;
+							}
 						}
 					}
 					else if (event.key.keysym.sym == SDLK_DOWN)
