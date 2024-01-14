@@ -631,7 +631,7 @@ struct StanGry {
 	}
 	void liczPunkty(int zycia, int czas)
 	{
-		punkty = 250 + 250 * zycia + 500 * ukonczonePoziomy - (czas / 2) * 10 + 100 * bonus;
+		punkty = 250 + 250 * zycia + 500 * ukonczonePoziomy - (czas / 10) * 100 + 100 * bonus;
 	}
 	void zapisz(FILE* plik)
 	{
@@ -1659,6 +1659,8 @@ int main(int argc, char** argv) {
 						heart.restart();
 						trophy.active = true;
 						worldTime = 0;
+						stanGry.punkty = stanGry.ukonczonePoziomy = stanGry.bonus = 0;
+
 					}
 					else if (event.key.keysym.sym == SDLK_1) {
 						stanGry.wybranaMapa = 1;
