@@ -1525,6 +1525,8 @@ int main(int argc, char** argv) {
 				if (stanGry.wybranaMapa < 3) {
 					stanGry.wybranaMapa++;
 					trophy.active = true;
+					monkey.restart(stanGry.wybranaMapa);
+					princess.restart(stanGry.wybranaMapa);
 				}
 				else
 				{
