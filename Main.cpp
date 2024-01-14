@@ -2,8 +2,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
-#include <iostream>
-using namespace std;
+
 
 
 extern "C" {
@@ -21,7 +20,8 @@ enum ObecnyEtap
 	poZbiciu = 2,
 	wyborEtapu = 3,
 	wyniki = 4,
-	zapiszWynik = 5
+	zapiszWynik = 5,
+	wygrana = 6
 };
 
 struct Mapa {
@@ -346,7 +346,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 100.0;	// przyspieszone do testow
+		SpeedMultiplier = 1000.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -354,7 +354,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 100.0;	// przyspieszone do testow
+		SpeedMultiplier = 1000.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -825,8 +825,9 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa, Monkey& monk
 		monkey.Y = 282;
 		princess.X = 360;
 		princess.Y = 276;
-		/*barrel.X = 140;
-		barrel.Y = 282;	*/			// WTEDY SIE NIE RUSZA CHYBA WINA WSKAZNIKOW
+		/*	barrel.X = 140;
+			barrel.Y = 282;*/
+			// WTEDY SIE NIE RUSZA CHYBA WINA WSKAZNIKOW
 	}
 	if (wybranaMapa == 2)
 	{
@@ -834,8 +835,10 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa, Monkey& monk
 		monkey.Y = 282;
 		princess.X = 360;
 		princess.Y = 276;
-		/*	barrel.X = 140;				// DLATEGO CHCIALEM ZROBIC TA FUNKCJE MOVE BARREL
+		/*	barrel.X = 140;
 			barrel.Y = 282;*/
+			// DLATEGO CHCIALEM ZROBIC TA FUNKCJE MOVE BARREL
+
 	}
 	if (wybranaMapa == 3)
 	{
@@ -847,8 +850,9 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa, Monkey& monk
 		monkey.Y = 80;
 		princess.X = 400;
 		princess.Y = 80;
-		/*	barrel.X = 230;		// ZEBY OPEROWAC NA WSKAZNIKACH ALE FUNKCJA MI NIE WYSZLA XD
-			barrel.Y = 80;*/
+		/*barrel.X = 230;
+		barrel.Y = 80;*/
+		// ZEBY OPEROWAC NA WSKAZNIKACH ALE FUNKCJA NIC NIE ZMIENILA 
 	}
 }
 
@@ -929,6 +933,47 @@ void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, boo
 	timeRestart(worldTime);
 	resetFlag(flag);
 }
+
+bool canMoveRight(Mario& mario)
+{
+	if (mario.X >= 930 && (mario.Y < 682 && mario.Y > 678) ||
+		mario.X >= 930 && (mario.Y < 482 && mario.Y > 478) ||
+		mario.X >= 930 && (mario.Y < 282 && mario.Y > 278) ||
+		mario.X >= 930 && (mario.Y < 82 && mario.Y > 78))
+
+	{
+		return false;
+	}
+	else if (mario.X >= 988 && (mario.Y < 582 && mario.Y > 578) ||
+		mario.X >= 988 && (mario.Y < 382 && mario.Y > 378) ||
+		mario.X >= 988 && (mario.Y < 182 && mario.Y > 178))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool canMoveLeft(Mario& mario)
+{
+	if (mario.X <= 92 && (mario.Y < 682 && mario.Y > 678) ||
+		mario.X <= 92 && (mario.Y < 482 && mario.Y > 478) ||
+		mario.X <= 92 && (mario.Y < 282 && mario.Y > 278))
+
+	{
+		return false;
+	}
+	else if (mario.X <= 150 && (mario.Y < 582 && mario.Y > 578) ||
+		mario.X <= 150 && (mario.Y < 382 && mario.Y > 378) ||
+		mario.X <= 150 && (mario.Y < 182 && mario.Y > 178))
+	{
+		return false;
+	}
+	return true;
+}
+
+
+
 
 // 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
 
@@ -1405,6 +1450,32 @@ int main(int argc, char** argv) {
 				};
 			};
 		}
+		// ==================================== Wygrana ==================================== //
+		else if (stanGry.obecnyEtap == wygrana)
+		{
+			sprintf(text, "Wygrales!!!");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
+			sprintf(text, "zdobyte punkty: %d", stanGry.punkty);
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
+			sprintf(text, "zeby wyjsc nacisnij escape");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 45, text, charset);
+
+			while (SDL_PollEvent(&event)) {
+				switch (event.type) {
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_ESCAPE)
+					{
+						stanGry.obecnyEtap = menu;
+						stanGry.trwaGra = false;
+						gameOver(mario, barrel, heart, worldTime, flag);
+					}
+					break;
+				case SDL_QUIT:
+					quit = 1;
+					break;
+				};
+			};
+		}
 
 
 		// ====================================== Gra ====================================== //
@@ -1444,7 +1515,9 @@ int main(int argc, char** argv) {
 				}
 				else
 				{
-					tabelaWynikow.zapiszNowyWynik("test", stanGry.punkty);
+					//tabelaWynikow.zapiszNowyWynik("test", stanGry.punkty);
+					//cout << "dd";
+					stanGry.obecnyEtap = wygrana;
 				}
 				stanGry.ukonczonePoziomy++;
 				mario.restart();
@@ -1470,8 +1543,8 @@ int main(int argc, char** argv) {
 			{
 				trophy.active = false;
 				stanGry.bonus++;
-				cout << "dziala";
 			}
+
 
 			mario.addX(delta);
 			mario.addY(delta);
@@ -1524,11 +1597,24 @@ int main(int argc, char** argv) {
 					else if (event.key.keysym.sym == SDLK_LEFT)
 					{
 						if (!mario.naDrabinie)
-							mario.ruchX(-1.0);  // Ustaw prędkość ruchu Mario w lewo
+						{
+							mario.ruchX(-1.0);
+						}
+						if (!canMoveLeft(mario))
+						{
+							mario.ruchX(0.0);
+						}
 					}
-					else if (event.key.keysym.sym == SDLK_RIGHT) {
+					else if (event.key.keysym.sym == SDLK_RIGHT)
+					{
 						if (!mario.naDrabinie)
-							mario.ruchX(1.0);  // Ustaw prędkość ruchu Mario w prawo
+						{
+							mario.ruchX(1.0);
+						}
+						if (!canMoveRight(mario))
+						{
+							mario.ruchX(0.0);
+						}
 					}
 					else if (event.key.keysym.sym == SDLK_UP)
 					{
@@ -1556,6 +1642,7 @@ int main(int argc, char** argv) {
 						mario.restart();
 						barrel.restart();
 						heart.restart();
+						trophy.active = true;
 						worldTime = 0;
 					}
 					else if (event.key.keysym.sym == SDLK_1) {
