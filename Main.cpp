@@ -2,8 +2,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
-#include <iostream>
-using namespace std;
+
 
 
 extern "C" {
@@ -13,6 +12,13 @@ extern "C" {
 
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
+#define RIGHT_SHORTER_BARIER 930
+#define RIGHT_LOGER_BARIER 988
+#define LEFT_SHORTER_BARIER 92
+#define LEFT_LOGER_BARIER 150
+
+
+
 
 enum ObecnyEtap
 {
@@ -347,7 +353,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 1000.0;	// przyspieszone do testow
+		SpeedMultiplier = 300.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -364,11 +370,11 @@ struct Barrel {
 			Y = 282;
 			break;
 		case 3:
-			X = 140;
+			X = 240;
 			Y = 82;
 			break;
 		}
-		SpeedMultiplier = 1000.0;	// przyspieszone do testow
+		SpeedMultiplier = 300.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -442,7 +448,7 @@ struct Monkey {
 		Y = 282;
 		if (wybranaMapa == 3)
 		{
-			X = 110;
+			X = 200;
 			Y = 82;
 		}
 	}
@@ -473,7 +479,7 @@ struct Princess {
 		Y = 276;
 		if (wybranaMapa == 3)
 		{
-			X = 360;
+			X = 400;
 			Y = 76;
 		}
 	}
@@ -647,82 +653,6 @@ struct StanGry {
 	}
 };
 
-struct TabelaWynikow {
-	const char* nazwaPliku = "wyniki";
-	char* nazwa;
-	int* punkty;
-	int strony;
-	int iloscWynikow;
-	TabelaWynikow()
-	{
-		int n, i = 0;
-		FILE* plik = fopen(nazwaPliku, "r");
-		if (!plik)
-		{
-			punkty = new int();
-			nazwa = new char[10];
-			strony = 0;
-			iloscWynikow = 0;
-			return;
-		}
-		else
-		{
-			iloscWynikow = 0;
-			fread(&iloscWynikow, sizeof(int), 1, plik);
-			punkty = new int(iloscWynikow);
-			nazwa = new char[iloscWynikow * 10];
-			strony = iloscWynikow / 10 + 1;
-			for (int i = 0; i < iloscWynikow; i++);
-			{
-				fread(&punkty[i * 10], sizeof(int), 1, plik);
-				fread(&nazwa[i * 10], sizeof(char[10]), 1, plik);
-			}
-		}
-	}
-	void wczytajWyniki()
-	{
-		int n, i = 0;
-		FILE* plik = fopen(nazwaPliku, "r");
-		if (!plik)
-		{
-			punkty = new int();
-			nazwa = new char[10];
-			strony = 0;
-			iloscWynikow = 0;
-			return;
-		}
-		else
-		{
-			fread(&iloscWynikow, sizeof(int), 1, plik);
-			punkty = new int(iloscWynikow);
-			nazwa = new char[iloscWynikow * 10];
-			strony = iloscWynikow / 10 + 1;
-			for (int i = 0; i < iloscWynikow; i++);
-			{
-				fread(&punkty[i * 10], sizeof(int), 1, plik);
-				fread(&nazwa[i * 10], sizeof(char), strlen(&nazwa[i * 10]), plik);
-			}
-		}
-	}
-	void zapiszNowyWynik(char nazwaGracza[10], int pkt)
-	{
-		//wczytajWyniki();
-		int i = 0;
-		FILE* plik2 = fopen(nazwaPliku, "w");
-		int number = iloscWynikow + 1;
-
-		fwrite(&number, sizeof(int), 1, plik2);
-		/*
-		for (i = 0; i < iloscWynikow; i++);
-		{
-			fwrite(&punkty[i * 10], sizeof(int), 1, plik2);
-			fwrite(&nazwa[i * 10], sizeof(char[10]), 1, plik2);
-		}
-		fwrite(&pkt, sizeof(int), 1, plik2);
-		fwrite(nazwaGracza, sizeof(char[10]), 1, plik2);*/
-		fclose(plik2);
-	}
-};
 
 void zapisGry(bool active, double worldTime, Mario* mario, Barrel* barell, Monkey* monkey, Princess* princess, Heart* heart, StanGry* stanGry)
 {
@@ -900,7 +830,7 @@ void resetFlag(bool& flag)
 
 void moveBarrel(Barrel& barrel, bool& flag, double delta, int wybranaMapa)
 {
-	if (barrel.X > 980 && barrel.Y > 680) {
+	if (barrel.X > RIGHT_SHORTER_BARIER && barrel.Y > 680) {
 		barrel.restart(wybranaMapa);
 		resetFlag(flag);
 	}
@@ -911,14 +841,14 @@ void moveBarrel(Barrel& barrel, bool& flag, double delta, int wybranaMapa)
 		else {
 			barrel.X -= barrel.SpeedMultiplier * delta;
 		}
-		if (barrel.X > 1000) {
+		if (barrel.X > SCREEN_WIDTH-80) {	//TODO
 			barrel.Y += 100;
 
 			barrel.moveRight = false;
 
 			barrel.X = 1000;
 		}
-		else if (barrel.X < 100) {
+		else if (barrel.X < LEFT_LOGER_BARIER-50) {
 			barrel.Y += 100;
 
 			barrel.moveRight = true;
@@ -938,41 +868,41 @@ void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, boo
 
 bool canMoveRight(Mario& mario)
 {
-	if (mario.X >= 930 && (mario.Y < 682 && mario.Y > 678) ||
-		mario.X >= 930 && (mario.Y < 482 && mario.Y > 478) ||
-		mario.X >= 930 && (mario.Y < 282 && mario.Y > 278) ||
-		mario.X >= 930 && (mario.Y < 82 && mario.Y > 78))
+	if (mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 682 && mario.Y > 678) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 482 && mario.Y > 478) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 282 && mario.Y > 278) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 82 && mario.Y > 78))
 
 	{
 		return false;
 	}
-	else if (mario.X >= 988 && (mario.Y < 582 && mario.Y > 578) ||
-		mario.X >= 988 && (mario.Y < 382 && mario.Y > 378) ||
-		mario.X >= 988 && (mario.Y < 182 && mario.Y > 178))
+	else if (mario.X >= RIGHT_LOGER_BARIER && (mario.Y < 582 && mario.Y > 578) ||
+		mario.X >= RIGHT_LOGER_BARIER && (mario.Y < 382 && mario.Y > 378) ||
+		mario.X >= RIGHT_LOGER_BARIER && (mario.Y < 182 && mario.Y > 178))
 	{
 		return false;
 	}
 
 	return true;
-}
+}//TODO
 
 bool canMoveLeft(Mario& mario)
 {
-	if (mario.X <= 92 && (mario.Y < 682 && mario.Y > 678) ||
-		mario.X <= 92 && (mario.Y < 482 && mario.Y > 478) ||
-		mario.X <= 92 && (mario.Y < 282 && mario.Y > 278))
+	if (mario.X <= LEFT_SHORTER_BARIER && (mario.Y < 682 && mario.Y > 678) ||
+		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < 482 && mario.Y > 478) ||
+		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < 282 && mario.Y > 278))
 
 	{
 		return false;
 	}
-	else if (mario.X <= 150 && (mario.Y < 582 && mario.Y > 578) ||
-		mario.X <= 150 && (mario.Y < 382 && mario.Y > 378) ||
-		mario.X <= 150 && (mario.Y < 182 && mario.Y > 178))
+	else if (mario.X <= LEFT_LOGER_BARIER && (mario.Y < 582 && mario.Y > 578) ||
+		mario.X <= LEFT_LOGER_BARIER && (mario.Y < 382 && mario.Y > 378) ||
+		mario.X <= LEFT_LOGER_BARIER && (mario.Y < 182 && mario.Y > 178))
 	{
 		return false;
 	}
 	return true;
-}
+}//TODO
 
 void bonusForBarrel(Barrel& barrel, Mario& mario, StanGry& stanGry)
 {
@@ -1005,7 +935,7 @@ int main(int argc, char** argv) {
 	Heart heart = Heart();
 	Trophy trophy = Trophy();
 	StanGry stanGry = StanGry();
-	TabelaWynikow tabelaWynikow = TabelaWynikow();
+	//TabelaWynikow tabelaWynikow = TabelaWynikow();
 
 	SDL_Event event;
 	SDL_Surface* screen, * charset;
@@ -1081,7 +1011,6 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
-
 	barrelPNG = SDL_LoadBMP("./barrel.bmp");
 	if (barrelPNG == NULL) {
 		printf("SDL_LoadBMP(mario.bmp) error: %s\n", SDL_GetError());
@@ -1093,7 +1022,6 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
-
 	monkeyPNG = SDL_LoadBMP("./monkey.bmp");
 	if (monkeyPNG == NULL) {
 		printf("SDL_LoadBMP(monkey.bmp) error: %s\n", SDL_GetError());
@@ -1105,7 +1033,6 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
-
 	princessPNG = SDL_LoadBMP("./princess.bmp");
 	if (princessPNG == NULL) {
 		printf("SDL_LoadBMP(princess.bmp) error: %s\n", SDL_GetError());
@@ -1117,7 +1044,6 @@ int main(int argc, char** argv) {
 		SDL_Quit();
 		return 1;
 	};
-
 	heartPNG = SDL_LoadBMP("./heart.bmp");
 	if (heartPNG == NULL) {
 		printf("SDL_LoadBMP(princess.bmp) error: %s\n", SDL_GetError());
@@ -1157,7 +1083,7 @@ int main(int argc, char** argv) {
 	distance = 0;
 
 	//zmienne stanu gry
-	char* elementyMenu[] = { "Wznow gre", "Nowa gra", "Zapisz gre", "Wczytaj gre", "Wyniki", "Wybor etapu", "Wyjscie" };
+	char* elementyMenu[] = { "Wznow gre", "Nowa gra", "Zapisz gre", "Wczytaj gre", "Wyniki // nie zrobione", "Wybor etapu", "Wyjscie" };
 	int iloscElementowMenu = 7, wybranyElement = 1, wybrany = 1;
 	char strzalka;
 
@@ -1196,6 +1122,9 @@ int main(int argc, char** argv) {
 					DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + i * 15, text, charset);
 				}
 			}
+			sprintf(text, "Podaj swoj nick, maksymalnie 9 znakow:");
+			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 200, text, charset);
+			DrawString(screen, screen->w / 2 - strlen(nick) * 8 / 2, screen->h / 3 + 215, nick, charset);
 
 			while (SDL_PollEvent(&event)) {
 				switch (event.type) {
@@ -1230,7 +1159,7 @@ int main(int argc, char** argv) {
 							princess.restart(stanGry.wybranaMapa);
 							barrel.restart(stanGry.wybranaMapa);
 							heart.restart();
-							worldTime = 0;
+							timeRestart(worldTime);
 							stanGry.nowaGra();
 							trophy.active = true;
 							break;
@@ -1247,16 +1176,27 @@ int main(int argc, char** argv) {
 							else
 								stanGry.bladOdczytu = true;
 							break;
-						case 4://Wyniki
-							tabelaWynikow.wczytajWyniki();
-							stanGry.zmienEtap(wyniki);
-							break;
 						case 5://Wybor etapu
 							stanGry.zmienEtap(wyborEtapu);
 							break;
 						case 6://Wyjscie
 							quit = 1;
 							break;
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_BACKSPACE)
+					{
+						int length = strlen(nick);
+						if (length > 0)
+							nick[length - 1] = '\0';
+					}
+					else
+					{
+						int length = strlen(nick);
+						if (length < 9)
+						{
+							nick[length] = *SDL_GetKeyName(event.key.keysym.sym);
+							nick[length + 1] = '\0';
 						}
 					}
 					break;
@@ -1302,7 +1242,7 @@ int main(int argc, char** argv) {
 					else if (event.key.keysym.sym == SDLK_RETURN)
 					{
 						heart.restart();
-						worldTime = 0;
+						timeRestart(worldTime);
 						stanGry.nowaGra();
 						stanGry.wybranaMapa = wybrany;
 						mario.restart();
@@ -1310,44 +1250,6 @@ int main(int argc, char** argv) {
 						monkey.restart(stanGry.wybranaMapa);
 						barrel.restart(stanGry.wybranaMapa);
 						trophy.active = true;
-					}
-					break;
-				case SDL_QUIT:
-					quit = 1;
-					break;
-				};
-			};
-		}
-		// ================================ Tabela wynikow ================================ //
-		else if (stanGry.obecnyEtap == wyniki)
-		{
-			sprintf(text, "Tabela wynikow, wcisnij esc zeby wyjsc");
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 6, text, charset);
-			sprintf(text, "punkty           nick");
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 6 + 50, text, charset);
-			if (tabelaWynikow.strony > 1)
-			{
-				sprintf(text, "przelaczaj strony strzalkami");
-				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 6 + 15, text, charset);
-			}
-			/*for (int i = 0; i < 10 && i < tabelaWynikow.iloscWynikow; i++)
-			{
-				sprintf(text, "%d     ", &tabelaWynikow.punkty[i]);
-				strcat(text, &tabelaWynikow.nazwa[i]);
-				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 4 + i * 10, text, charset);
-			}*/
-			while (SDL_PollEvent(&event)) {
-				switch (event.type) {
-				case SDL_KEYDOWN:
-					if (event.key.keysym.sym == SDLK_ESCAPE)
-						stanGry.obecnyEtap = menu;
-					else if (event.key.keysym.sym == SDLK_RIGHT)
-					{
-
-					}
-					else if (event.key.keysym.sym == SDLK_LEFT)
-					{
-						//TODO zmiana stron
 					}
 					break;
 				case SDL_QUIT:
@@ -1367,23 +1269,25 @@ int main(int argc, char** argv) {
 				}
 			}
 
-			sprintf(text, "Utraciles zycie");
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
-			sprintf(text, "zdobyte punkty: %d", stanGry.punkty);
+	
+			sprintf(text, "Zdobyte punkty: %d", stanGry.punkty);
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
-			sprintf(text, "Zeby zapisac wynik wcisnij s");
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 30, text, charset);
+		
 
 			if (heart.isGameOver())
 			{
-				sprintf(text, "żeby wyjsc nacisnij escape");
+				sprintf(text, "GAME OVER");
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
+				sprintf(text, "Esc - wyjscie");
 				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 45, text, charset);
 			}
 			else
 			{
-				sprintf(text, "Jesli chcesz wrocic do gry wcisnij spacje,");
+				sprintf(text, "Straciles zycie");
+				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
+				sprintf(text, "W - wroc do gry");
 				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 45, text, charset);
-				sprintf(text, "a jesli chcesz wyjsc to wcisnij escape");
+				sprintf(text, "Esc - wyjscie");
 				DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 60, text, charset);
 			}
 			while (SDL_PollEvent(&event)) {
@@ -1395,64 +1299,10 @@ int main(int argc, char** argv) {
 						stanGry.trwaGra = false;
 						gameOver(mario, barrel, heart, worldTime, flag, stanGry.wybranaMapa);
 					}
-					else if (event.key.keysym.sym == SDLK_SPACE)
+					else if (event.key.keysym.sym == SDLK_w)
 					{
 						if (!heart.isGameOver())
 							stanGry.obecnyEtap = gra;
-					}
-					else if (event.key.keysym.sym == SDLK_s)
-					{
-						stanGry.obecnyEtap = zapiszWynik;
-						stanGry.trwaGra = false;
-					}
-					break;
-				case SDL_QUIT:
-					quit = 1;
-					break;
-				};
-			};
-		}
-		// ================================== Zapisz wynik ================================== //
-		else if (stanGry.obecnyEtap == zapiszWynik)
-		{
-			sprintf(text, "Zapisz swoj wynik");
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
-			sprintf(text, "zdobyte punkty: %d", stanGry.punkty);
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
-			sprintf(text, "Podaj swoj nick, maksymalnie 9 znakow:");
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 30, text, charset);
-			DrawString(screen, screen->w / 2 - strlen(nick) * 8 / 2, screen->h / 3 + 45, nick, charset);
-			sprintf(text, "Wcisnij enter zeby zatwierdzic, escape zeby wyjsc");
-			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 80, text, charset);
-			while (SDL_PollEvent(&event)) {
-				switch (event.type) {
-				case SDL_KEYDOWN:
-					if (event.key.keysym.sym == SDLK_ESCAPE)
-					{
-						stanGry.obecnyEtap = menu;
-						stanGry.trwaGra = false;
-						gameOver(mario, barrel, heart, worldTime, flag, stanGry.wybranaMapa);
-					}
-					else if (event.key.keysym.sym == SDLK_RETURN)
-					{
-						stanGry.obecnyEtap = menu;
-						stanGry.trwaGra = false;
-						gameOver(mario, barrel, heart, worldTime, flag, stanGry.wybranaMapa);
-					}
-					else if (event.key.keysym.sym == SDLK_BACKSPACE)
-					{
-						int length = strlen(nick);
-						if (length > 0)
-							nick[length - 1] = '\0';
-					}
-					else
-					{
-						int length = strlen(nick);
-						if (length < 9)
-						{
-							nick[length] = *SDL_GetKeyName(event.key.keysym.sym);
-							nick[length + 1] = '\0';
-						}
 					}
 					break;
 				case SDL_QUIT:
@@ -1464,11 +1314,11 @@ int main(int argc, char** argv) {
 		// ==================================== Wygrana ==================================== //
 		else if (stanGry.obecnyEtap == wygrana)
 		{
-			sprintf(text, "Wygrales!!!");
+			sprintf(text, "YOU WON!!!");
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3, text, charset);
-			sprintf(text, "zdobyte punkty: %d", stanGry.punkty);
+			sprintf(text, "Zdobyte punkty: %d", stanGry.punkty);
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
-			sprintf(text, "zeby wyjsc nacisnij escape");
+			sprintf(text, "Esc - wyjscie");
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 45, text, charset);
 
 			while (SDL_PollEvent(&event)) {
@@ -1530,8 +1380,6 @@ int main(int argc, char** argv) {
 				}
 				else
 				{
-					//tabelaWynikow.zapiszNowyWynik("test", stanGry.punkty);
-					//cout << "dd";
 					stanGry.obecnyEtap = wygrana;
 				}
 				stanGry.ukonczonePoziomy++;
@@ -1658,7 +1506,7 @@ int main(int argc, char** argv) {
 						barrel.restart(stanGry.wybranaMapa);
 						heart.restart();
 						trophy.active = true;
-						worldTime = 0;
+						timeRestart(worldTime);
 						stanGry.punkty = stanGry.ukonczonePoziomy = stanGry.bonus = 0;
 
 					}
