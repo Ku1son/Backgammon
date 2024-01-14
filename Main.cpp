@@ -354,7 +354,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 300.0;	// przyspieszone do testow
+		SpeedMultiplier = 1000.0;	
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -375,7 +375,7 @@ struct Barrel {
 			Y = 82;
 			break;
 		}
-		SpeedMultiplier = 300.0;	// przyspieszone do testow
+		SpeedMultiplier = 1000.0;	
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -831,7 +831,7 @@ void resetFlag(bool& flag)
 
 void moveBarrel(Barrel& barrel, bool& flag, double delta, int wybranaMapa)
 {
-	if (barrel.X > RIGHT_SHORTER_BARIER && barrel.Y > 680) { 
+	if (barrel.X > RIGHT_SHORTER_BARIER && barrel.Y > 680) {
 		barrel.restart(wybranaMapa);
 		resetFlag(flag);
 	}
@@ -842,7 +842,7 @@ void moveBarrel(Barrel& barrel, bool& flag, double delta, int wybranaMapa)
 		else {
 			barrel.X -= barrel.SpeedMultiplier * delta;
 		}
-		if (barrel.X > RIGHT_LONGER_BARIER + 12) {	
+		if (barrel.X > RIGHT_LONGER_BARIER + 12) {
 			barrel.Y += 100;
 
 			barrel.moveRight = false;
@@ -869,16 +869,16 @@ void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, boo
 
 bool canMoveRight(Mario& mario)
 {
-	if (mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+600 && mario.Y > FIRST_PODLOGA_Y+595) ||
-		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+400 && mario.Y > FIRST_PODLOGA_Y+395) ||
-		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+200 && mario.Y > FIRST_PODLOGA_Y+195) ||
-		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y && mario.Y > FIRST_PODLOGA_Y-5))
+	if (mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 600 && mario.Y > FIRST_PODLOGA_Y + 595) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 400 && mario.Y > FIRST_PODLOGA_Y + 395) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 200 && mario.Y > FIRST_PODLOGA_Y + 195) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y && mario.Y > FIRST_PODLOGA_Y - 5))
 	{
 		return false;
 	}
-	else if (mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+500 && mario.Y > FIRST_PODLOGA_Y+495) ||
-		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+300 && mario.Y > FIRST_PODLOGA_Y+295) ||
-		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+100 && mario.Y > FIRST_PODLOGA_Y+95))
+	else if (mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 500 && mario.Y > FIRST_PODLOGA_Y + 495) ||
+		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
+		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
 	{
 		return false;
 	}
@@ -888,16 +888,16 @@ bool canMoveRight(Mario& mario)
 
 bool canMoveLeft(Mario& mario)
 {
-	if (mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+600 && mario.Y > FIRST_PODLOGA_Y+595) ||
-		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+400 && mario.Y > FIRST_PODLOGA_Y+395) ||
-		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+200 && mario.Y > FIRST_PODLOGA_Y+195))
+	if (mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 600 && mario.Y > FIRST_PODLOGA_Y + 595) ||
+		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 400 && mario.Y > FIRST_PODLOGA_Y + 395) ||
+		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 200 && mario.Y > FIRST_PODLOGA_Y + 195))
 
 	{
 		return false;
 	}
-	else if (mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+500 && mario.Y > FIRST_PODLOGA_Y+495) ||
-		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+300 && mario.Y > FIRST_PODLOGA_Y+295) ||
-		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+100 && mario.Y > FIRST_PODLOGA_Y+95))
+	else if (mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 500 && mario.Y > FIRST_PODLOGA_Y + 495) ||
+		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
+		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
 	{
 		return false;
 	}
