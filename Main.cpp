@@ -2,7 +2,8 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
-
+#include <iostream>
+using namespace std;
 
 
 extern "C" {
@@ -972,7 +973,13 @@ bool canMoveLeft(Mario& mario)
 	return true;
 }
 
-
+void bonusForBarrel(Barrel& barrel, Mario& mario, StanGry& stanGry)
+{
+	if (mario.Y < barrel.Y && ((barrel.Y - mario.Y) < 3) && mario.skok)
+	{
+		stanGry.bonus++;
+	}
+}
 
 
 // 11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
@@ -1493,6 +1500,8 @@ int main(int argc, char** argv) {
 			stanGry.liczPunkty(heart.pozostaleSerca(), (int)worldTime);
 
 			moveBarrel(barrel, flag, delta);
+
+			bonusForBarrel(barrel, mario, stanGry);
 
 			if (mario.skok)
 			{
