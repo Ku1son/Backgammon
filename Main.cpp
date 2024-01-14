@@ -351,10 +351,23 @@ struct Barrel {
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
-	void restart()
+	void restart(int wybranaMapa)
 	{
-		X = 140;
-		Y = 282;
+		switch (wybranaMapa)
+		{
+		case 1:
+			X = 140;
+			Y = 282;
+			break;
+		case 2:
+			X = 140;
+			Y = 282;
+			break;
+		case 3:
+			X = 140;
+			Y = 82;
+			break;
+		}
 		SpeedMultiplier = 1000.0;	// przyspieszone do testow
 		SpeedX = 0.0;
 		SpeedY = 0.0;
@@ -423,9 +436,15 @@ struct Monkey {
 		X = 110;
 		Y = 282;
 	}
-	void restart()
+	void restart(int wybranaMapa)
 	{
-		// TODO chyba
+		X = 110;
+		Y = 282;
+		if (wybranaMapa == 3)
+		{
+			X = 110;
+			Y = 82;
+		}
 	}
 	void zapisz(FILE* plik)
 	{
@@ -447,6 +466,16 @@ struct Princess {
 	{
 		X = 360;
 		Y = 276;
+	}
+	void restart(int wybranaMapa)
+	{
+		X = 360;
+		Y = 276;
+		if (wybranaMapa == 3)
+		{
+			X = 360;
+			Y = 76;
+		}
 	}
 	void zapisz(FILE* plik)
 	{
@@ -820,40 +849,12 @@ void rysujPlansze(SDL_Surface* screen, Mapa mapa, int& wybranaMapa, Monkey& monk
 	{
 		rysujDrabine(screen, mapa.drabinaX[j], mapa.drabinaY[j]);
 	}
-	if (wybranaMapa == 1)
-	{
-		monkey.X = 110;
-		monkey.Y = 282;
-		princess.X = 360;
-		princess.Y = 276;
-		/*	barrel.X = 140;
-			barrel.Y = 282;*/
-			// WTEDY SIE NIE RUSZA CHYBA WINA WSKAZNIKOW
-	}
-	if (wybranaMapa == 2)
-	{
-		monkey.X = 110;
-		monkey.Y = 282;
-		princess.X = 360;
-		princess.Y = 276;
-		/*	barrel.X = 140;
-			barrel.Y = 282;*/
-			// DLATEGO CHCIALEM ZROBIC TA FUNKCJE MOVE BARREL
-
-	}
 	if (wybranaMapa == 3)
 	{
 		for (int i = 0; i < 2; i++)
 		{
 			rysujPodloge(screen, mapa.podlogaP3X[i], mapa.podlogaP3Y[i]);
 		}
-		monkey.X = 200;
-		monkey.Y = 80;
-		princess.X = 400;
-		princess.Y = 80;
-		/*barrel.X = 230;
-		barrel.Y = 80;*/
-		// ZEBY OPEROWAC NA WSKAZNIKACH ALE FUNKCJA NIC NIE ZMIENILA 
 	}
 }
 
@@ -897,10 +898,10 @@ void resetFlag(bool& flag)
 	flag = true;
 }
 
-void moveBarrel(Barrel& barrel, bool& flag, double delta)
+void moveBarrel(Barrel& barrel, bool& flag, double delta, int wybranaMapa)
 {
 	if (barrel.X > 980 && barrel.Y > 680) {
-		barrel.restart();
+		barrel.restart(wybranaMapa);
 		resetFlag(flag);
 	}
 	else {
@@ -927,9 +928,9 @@ void moveBarrel(Barrel& barrel, bool& flag, double delta)
 	}
 }
 
-void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, bool& flag) {	// TODO dodanie logiki gdy koniec gry (wyswietlenie menu)
+void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, bool& flag, int wybranaMapa) {	// TODO dodanie logiki gdy koniec gry (wyswietlenie menu)
 	mario.restart();
-	barrel.restart();
+	barrel.restart(wybranaMapa);
 	heart.restart();
 	timeRestart(worldTime);
 	resetFlag(flag);
@@ -1225,7 +1226,9 @@ int main(int argc, char** argv) {
 							break;
 						case 1://Nowa gra
 							mario.restart();
-							barrel.restart();
+							monkey.restart(stanGry.wybranaMapa);
+							princess.restart(stanGry.wybranaMapa);
+							barrel.restart(stanGry.wybranaMapa);
 							heart.restart();
 							worldTime = 0;
 							stanGry.nowaGra();
@@ -1298,13 +1301,14 @@ int main(int argc, char** argv) {
 					}
 					else if (event.key.keysym.sym == SDLK_RETURN)
 					{
-						mario.restart();
-						barrel.restart();
 						heart.restart();
 						worldTime = 0;
 						stanGry.nowaGra();
 						stanGry.wybranaMapa = wybrany;
-						stanGry.zmienEtap(gra);
+						mario.restart();
+						princess.restart(stanGry.wybranaMapa);
+						monkey.restart(stanGry.wybranaMapa);
+						barrel.restart(stanGry.wybranaMapa);
 						trophy.active = true;
 					}
 					break;
@@ -1389,7 +1393,7 @@ int main(int argc, char** argv) {
 					{
 						stanGry.obecnyEtap = menu;
 						stanGry.trwaGra = false;
-						gameOver(mario, barrel, heart, worldTime, flag);
+						gameOver(mario, barrel, heart, worldTime, flag, stanGry.wybranaMapa);
 					}
 					else if (event.key.keysym.sym == SDLK_SPACE)
 					{
@@ -1427,13 +1431,13 @@ int main(int argc, char** argv) {
 					{
 						stanGry.obecnyEtap = menu;
 						stanGry.trwaGra = false;
-						gameOver(mario, barrel, heart, worldTime, flag);
+						gameOver(mario, barrel, heart, worldTime, flag, stanGry.wybranaMapa);
 					}
 					else if (event.key.keysym.sym == SDLK_RETURN)
 					{
 						stanGry.obecnyEtap = menu;
 						stanGry.trwaGra = false;
-						gameOver(mario, barrel, heart, worldTime, flag);
+						gameOver(mario, barrel, heart, worldTime, flag, stanGry.wybranaMapa);
 					}
 					else if (event.key.keysym.sym == SDLK_BACKSPACE)
 					{
@@ -1474,7 +1478,7 @@ int main(int argc, char** argv) {
 					{
 						stanGry.obecnyEtap = menu;
 						stanGry.trwaGra = false;
-						gameOver(mario, barrel, heart, worldTime, flag);
+						gameOver(mario, barrel, heart, worldTime, flag, stanGry.wybranaMapa);
 					}
 					break;
 				case SDL_QUIT:
@@ -1499,7 +1503,7 @@ int main(int argc, char** argv) {
 
 			stanGry.liczPunkty(heart.pozostaleSerca(), (int)worldTime);
 
-			moveBarrel(barrel, flag, delta);
+			moveBarrel(barrel, flag, delta, stanGry.wybranaMapa);
 
 			bonusForBarrel(barrel, mario, stanGry);
 
@@ -1530,7 +1534,7 @@ int main(int argc, char** argv) {
 				}
 				stanGry.ukonczonePoziomy++;
 				mario.restart();
-				barrel.restart();
+				barrel.restart(stanGry.wybranaMapa);
 			}
 
 			if (barrel.kolizja(mario)) {
@@ -1540,7 +1544,7 @@ int main(int argc, char** argv) {
 							heart.isActive[i] = false;
 							stanGry.zmienEtap(poZbiciu);
 							mario.restart();
-							barrel.restart();
+							barrel.restart(stanGry.wybranaMapa);
 							resetFlag(flag);
 							break;
 						}
@@ -1649,7 +1653,7 @@ int main(int argc, char** argv) {
 					else if (event.key.keysym.sym == SDLK_n)
 					{
 						mario.restart();
-						barrel.restart();
+						barrel.restart(stanGry.wybranaMapa);
 						heart.restart();
 						trophy.active = true;
 						worldTime = 0;
@@ -1657,17 +1661,23 @@ int main(int argc, char** argv) {
 					else if (event.key.keysym.sym == SDLK_1) {
 						stanGry.wybranaMapa = 1;
 						mapa[stanGry.wybranaMapa - 1] = Mapa(stanGry.wybranaMapa);
-						barrel.restart();
+						monkey.restart(stanGry.wybranaMapa);
+						princess.restart(stanGry.wybranaMapa);
+						barrel.restart(stanGry.wybranaMapa);
 					}
 					else if (event.key.keysym.sym == SDLK_2) {
 						stanGry.wybranaMapa = 2;
 						mapa[stanGry.wybranaMapa - 1] = Mapa(stanGry.wybranaMapa);
-						barrel.restart();
+						monkey.restart(stanGry.wybranaMapa);
+						princess.restart(stanGry.wybranaMapa);
+						barrel.restart(stanGry.wybranaMapa);
 					}
 					else if (event.key.keysym.sym == SDLK_3) {
 						stanGry.wybranaMapa = 3;
 						mapa[stanGry.wybranaMapa - 1] = Mapa(stanGry.wybranaMapa);
-						barrel.restart();
+						monkey.restart(stanGry.wybranaMapa);
+						princess.restart(stanGry.wybranaMapa);
+						barrel.restart(stanGry.wybranaMapa);
 					}
 					break;
 				case SDL_KEYUP:
