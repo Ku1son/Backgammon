@@ -13,9 +13,10 @@ extern "C" {
 #define SCREEN_WIDTH 1080
 #define SCREEN_HEIGHT 720
 #define RIGHT_SHORTER_BARIER 930
-#define RIGHT_LOGER_BARIER 988
+#define RIGHT_LONGER_BARIER 988
 #define LEFT_SHORTER_BARIER 92
-#define LEFT_LOGER_BARIER 150
+#define LEFT_LONGER_BARIER 150
+#define FIRST_PODLOGA_Y 82
 
 
 
@@ -830,7 +831,7 @@ void resetFlag(bool& flag)
 
 void moveBarrel(Barrel& barrel, bool& flag, double delta, int wybranaMapa)
 {
-	if (barrel.X > RIGHT_SHORTER_BARIER && barrel.Y > 680) {
+	if (barrel.X > RIGHT_SHORTER_BARIER && barrel.Y > 680) { 
 		barrel.restart(wybranaMapa);
 		resetFlag(flag);
 	}
@@ -841,14 +842,14 @@ void moveBarrel(Barrel& barrel, bool& flag, double delta, int wybranaMapa)
 		else {
 			barrel.X -= barrel.SpeedMultiplier * delta;
 		}
-		if (barrel.X > SCREEN_WIDTH-80) {	//TODO
+		if (barrel.X > RIGHT_LONGER_BARIER + 12) {	
 			barrel.Y += 100;
 
 			barrel.moveRight = false;
 
 			barrel.X = 1000;
 		}
-		else if (barrel.X < LEFT_LOGER_BARIER-50) {
+		else if (barrel.X < LEFT_LONGER_BARIER - 50) {
 			barrel.Y += 100;
 
 			barrel.moveRight = true;
@@ -868,41 +869,40 @@ void gameOver(Mario& mario, Barrel& barrel, Heart& heart, double& worldTime, boo
 
 bool canMoveRight(Mario& mario)
 {
-	if (mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 682 && mario.Y > 678) ||
-		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 482 && mario.Y > 478) ||
-		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 282 && mario.Y > 278) ||
-		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < 82 && mario.Y > 78))
-
+	if (mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+600 && mario.Y > FIRST_PODLOGA_Y+595) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+400 && mario.Y > FIRST_PODLOGA_Y+395) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+200 && mario.Y > FIRST_PODLOGA_Y+195) ||
+		mario.X >= RIGHT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y && mario.Y > FIRST_PODLOGA_Y-5))
 	{
 		return false;
 	}
-	else if (mario.X >= RIGHT_LOGER_BARIER && (mario.Y < 582 && mario.Y > 578) ||
-		mario.X >= RIGHT_LOGER_BARIER && (mario.Y < 382 && mario.Y > 378) ||
-		mario.X >= RIGHT_LOGER_BARIER && (mario.Y < 182 && mario.Y > 178))
+	else if (mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+500 && mario.Y > FIRST_PODLOGA_Y+495) ||
+		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+300 && mario.Y > FIRST_PODLOGA_Y+295) ||
+		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+100 && mario.Y > FIRST_PODLOGA_Y+95))
 	{
 		return false;
 	}
 
 	return true;
-}//TODO
+}
 
 bool canMoveLeft(Mario& mario)
 {
-	if (mario.X <= LEFT_SHORTER_BARIER && (mario.Y < 682 && mario.Y > 678) ||
-		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < 482 && mario.Y > 478) ||
-		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < 282 && mario.Y > 278))
+	if (mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+600 && mario.Y > FIRST_PODLOGA_Y+595) ||
+		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+400 && mario.Y > FIRST_PODLOGA_Y+395) ||
+		mario.X <= LEFT_SHORTER_BARIER && (mario.Y < FIRST_PODLOGA_Y+200 && mario.Y > FIRST_PODLOGA_Y+195))
 
 	{
 		return false;
 	}
-	else if (mario.X <= LEFT_LOGER_BARIER && (mario.Y < 582 && mario.Y > 578) ||
-		mario.X <= LEFT_LOGER_BARIER && (mario.Y < 382 && mario.Y > 378) ||
-		mario.X <= LEFT_LOGER_BARIER && (mario.Y < 182 && mario.Y > 178))
+	else if (mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+500 && mario.Y > FIRST_PODLOGA_Y+495) ||
+		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+300 && mario.Y > FIRST_PODLOGA_Y+295) ||
+		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y+100 && mario.Y > FIRST_PODLOGA_Y+95))
 	{
 		return false;
 	}
 	return true;
-}//TODO
+}
 
 void bonusForBarrel(Barrel& barrel, Mario& mario, StanGry& stanGry)
 {
@@ -935,7 +935,6 @@ int main(int argc, char** argv) {
 	Heart heart = Heart();
 	Trophy trophy = Trophy();
 	StanGry stanGry = StanGry();
-	//TabelaWynikow tabelaWynikow = TabelaWynikow();
 
 	SDL_Event event;
 	SDL_Surface* screen, * charset;
@@ -1269,10 +1268,10 @@ int main(int argc, char** argv) {
 				}
 			}
 
-	
+
 			sprintf(text, "Zdobyte punkty: %d", stanGry.punkty);
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, screen->h / 3 + 15, text, charset);
-		
+
 
 			if (heart.isGameOver())
 			{
