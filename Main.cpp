@@ -23,7 +23,7 @@ extern "C" {
 
 enum ObecnyEtap
 {
-	menu = 0,	// CZEMU LICZBY???
+	menu = 0,	
 	gra = 1,
 	poZbiciu = 2,
 	wyborEtapu = 3,
@@ -343,7 +343,7 @@ struct Mario {
 };
 
 struct Barrel {
-	double SpeedMultiplier;  // Mnożnik prędkości Mario
+	double SpeedMultiplier;  
 	double SpeedX;
 	double SpeedY;
 	double X;
@@ -877,8 +877,8 @@ bool canMoveRight(Mario& mario)
 		return false;
 	}
 	else if (mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 500 && mario.Y > FIRST_PODLOGA_Y + 495) ||
-		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
-		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
+			 mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
+			 mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
 	{
 		return false;
 	}
@@ -1154,12 +1154,12 @@ int main(int argc, char** argv) {
 							break;
 						case 1://Nowa gra
 							mario.restart();
+							stanGry.nowaGra();
 							monkey.restart(stanGry.wybranaMapa);
 							princess.restart(stanGry.wybranaMapa);
 							barrel.restart(stanGry.wybranaMapa);
 							heart.restart();
 							timeRestart(worldTime);
-							stanGry.nowaGra();
 							trophy.active = true;
 							break;
 						case 2://Zapisz gre
@@ -1260,9 +1260,8 @@ int main(int argc, char** argv) {
 		// ========================= Informacja po utracie życia ========================= //
 		else if (stanGry.obecnyEtap == poZbiciu)
 		{
-			stanGry.liczPunkty(heart.heartLeft(), (int)worldTime);	// CZEMU TEZ TUTAJ???
-
-			for (int i = 0; i < 3; i++) {		// CZEMU TEZ TUTAJ???
+			stanGry.liczPunkty(heart.heartLeft(), (int)worldTime);	
+			for (int i = 0; i < 3; i++) {	
 				if (heart.isActive[i]) {
 					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
 				}
@@ -1386,13 +1385,13 @@ int main(int argc, char** argv) {
 				barrel.restart(stanGry.wybranaMapa);
 			}
 
-			if (barrel.kolizja(mario)) 
+			if (barrel.kolizja(mario))
 			{
-				if (deleteOnlyOneHeart(flag)) 
+				if (deleteOnlyOneHeart(flag))
 				{
-					for (int i = 2; i >= 0; --i) 
+					for (int i = 2; i >= 0; i--)
 					{
-						if (heart.isActive[i]) 
+						if (heart.isActive[i])
 						{
 							heart.isActive[i] = false;
 							stanGry.zmienEtap(poZbiciu);
@@ -1428,7 +1427,7 @@ int main(int argc, char** argv) {
 			if (trophy.active)
 				DrawSurface(screen, trophyPNG, trophy.X, trophy.Y);
 
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < 3; i++) {
 				if (heart.isActive[i]) {
 					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
 				}
