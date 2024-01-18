@@ -538,7 +538,7 @@ struct Heart {
 			isActive[i] = true;
 		}
 	}
-	int pozostaleSerca()
+	int heartLeft()
 	{
 		int n = 0;
 		for (int i = 0; i < 3; i++)
@@ -877,8 +877,8 @@ bool canMoveRight(Mario& mario)
 		return false;
 	}
 	else if (mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 500 && mario.Y > FIRST_PODLOGA_Y + 495) ||
-		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
-		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
+			 mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
+			 mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
 	{
 		return false;
 	}
@@ -896,8 +896,8 @@ bool canMoveLeft(Mario& mario)
 		return false;
 	}
 	else if (mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 500 && mario.Y > FIRST_PODLOGA_Y + 495) ||
-		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
-		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
+			 mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
+			 mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
 	{
 		return false;
 	}
@@ -1260,7 +1260,7 @@ int main(int argc, char** argv) {
 		// ========================= Informacja po utracie życia ========================= //
 		else if (stanGry.obecnyEtap == poZbiciu)
 		{
-			stanGry.liczPunkty(heart.pozostaleSerca(), (int)worldTime);
+			stanGry.liczPunkty(heart.heartLeft(), (int)worldTime);
 
 			for (int i = 0; i < 3; ++i) {
 				if (heart.isActive[i]) {
@@ -1350,7 +1350,7 @@ int main(int argc, char** argv) {
 
 			worldTime += delta;
 
-			stanGry.liczPunkty(heart.pozostaleSerca(), (int)worldTime);
+			stanGry.liczPunkty(heart.heartLeft(), (int)worldTime);
 
 			moveBarrel(barrel, flag, delta, stanGry.wybranaMapa);
 
@@ -1412,7 +1412,7 @@ int main(int argc, char** argv) {
 			mario.addY(delta);
 
 			sprintf(text, "%d", stanGry.punkty);
-			if (stanGry.punkty >= 1000) // if w celu poprawienia wygladu punktow
+			if (stanGry.punkty >= 1000) 
 				DrawString(screen, mario.X - 15, mario.Y - 30, text, charset);
 			else
 				DrawString(screen, mario.X - 10, mario.Y - 30, text, charset);
@@ -1439,7 +1439,7 @@ int main(int argc, char** argv) {
 			DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, czerwony, niebieski);
 			sprintf(text, "Etap %d, czas trwania = %.1lf s  %.0lf klatek / s", stanGry.wybranaMapa, worldTime, fps);
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
-			sprintf(text, "Esc - wyjscie, n - nowa gra, \032 - ruch w lewo, \033 - ruch w prawo");
+			sprintf(text, "Esc - wyjscie, n - nowa gra, \032 - ruch w lewo, \033 - ruch w prawo;	A, B, C, D, F");
 			DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
 
 			rysujPlansze(screen, mapa[stanGry.wybranaMapa - 1], stanGry.wybranaMapa, monkey, princess, barrel);
