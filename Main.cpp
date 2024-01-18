@@ -23,7 +23,7 @@ extern "C" {
 
 enum ObecnyEtap
 {
-	menu = 0,
+	menu = 0,	// CZEMU LICZBY???
 	gra = 1,
 	poZbiciu = 2,
 	wyborEtapu = 3,
@@ -354,7 +354,7 @@ struct Barrel {
 	{
 		X = 140;
 		Y = 282;
-		SpeedMultiplier = 1000.0;	
+		SpeedMultiplier = 1000.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 	}
@@ -375,7 +375,7 @@ struct Barrel {
 			Y = 82;
 			break;
 		}
-		SpeedMultiplier = 1000.0;	
+		SpeedMultiplier = 1000.0;
 		SpeedX = 0.0;
 		SpeedY = 0.0;
 		moveRight = true;
@@ -521,7 +521,7 @@ struct Heart {
 
 	Heart()
 	{
-		for (int i = 0; i < 3; ++i) {
+		for (int i = 0; i < 3; i++) {
 			X[i] = 30 + i * 52;
 			Y[i] = 70;
 			isActive[i] = true;
@@ -529,10 +529,10 @@ struct Heart {
 	}
 	void restart()
 	{
-		for (int i = 0; i < 3; ++i) {
+		for (int i = 0; i < 3; i++) {
 			isActive[i] = true;
 		}
-		for (int i = 0; i < 3; ++i) {
+		for (int i = 0; i < 3; i++) {
 			X[i] = 30 + i * 52;
 			Y[i] = 70;
 			isActive[i] = true;
@@ -636,9 +636,9 @@ struct StanGry {
 	{
 		obecnyEtap = wybrany;
 	}
-	void liczPunkty(int zycia, int czas)
+	void liczPunkty(int zycia, int worldTime)
 	{
-		punkty = 250 + 250 * zycia + 500 * ukonczonePoziomy - (czas / 10) * 100 + 100 * bonus;
+		punkty = 250 + 250 * zycia + 500 * ukonczonePoziomy - (worldTime / 10) * 100 + 100 * bonus;
 	}
 	void zapisz(FILE* plik)
 	{
@@ -877,8 +877,8 @@ bool canMoveRight(Mario& mario)
 		return false;
 	}
 	else if (mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 500 && mario.Y > FIRST_PODLOGA_Y + 495) ||
-			 mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
-			 mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
+		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
+		mario.X >= RIGHT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
 	{
 		return false;
 	}
@@ -896,8 +896,8 @@ bool canMoveLeft(Mario& mario)
 		return false;
 	}
 	else if (mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 500 && mario.Y > FIRST_PODLOGA_Y + 495) ||
-			 mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
-			 mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
+		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 300 && mario.Y > FIRST_PODLOGA_Y + 295) ||
+		mario.X <= LEFT_LONGER_BARIER && (mario.Y < FIRST_PODLOGA_Y + 100 && mario.Y > FIRST_PODLOGA_Y + 95))
 	{
 		return false;
 	}
@@ -1260,9 +1260,9 @@ int main(int argc, char** argv) {
 		// ========================= Informacja po utracie życia ========================= //
 		else if (stanGry.obecnyEtap == poZbiciu)
 		{
-			stanGry.liczPunkty(heart.heartLeft(), (int)worldTime);
+			stanGry.liczPunkty(heart.heartLeft(), (int)worldTime);	// CZEMU TEZ TUTAJ???
 
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < 3; i++) {		// CZEMU TEZ TUTAJ???
 				if (heart.isActive[i]) {
 					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
 				}
@@ -1386,10 +1386,14 @@ int main(int argc, char** argv) {
 				barrel.restart(stanGry.wybranaMapa);
 			}
 
-			if (barrel.kolizja(mario)) {
-				if (deleteOnlyOneHeart(flag)) {
-					for (int i = 2; i >= 0; --i) {
-						if (heart.isActive[i]) {
+			if (barrel.kolizja(mario)) 
+			{
+				if (deleteOnlyOneHeart(flag)) 
+				{
+					for (int i = 2; i >= 0; --i) 
+					{
+						if (heart.isActive[i]) 
+						{
 							heart.isActive[i] = false;
 							stanGry.zmienEtap(poZbiciu);
 							mario.restart();
@@ -1412,7 +1416,7 @@ int main(int argc, char** argv) {
 			mario.addY(delta);
 
 			sprintf(text, "%d", stanGry.punkty);
-			if (stanGry.punkty >= 1000) 
+			if (stanGry.punkty >= 1000)
 				DrawString(screen, mario.X - 15, mario.Y - 30, text, charset);
 			else
 				DrawString(screen, mario.X - 10, mario.Y - 30, text, charset);
@@ -1423,6 +1427,7 @@ int main(int argc, char** argv) {
 			DrawSurface(screen, princessPNG, princess.X, princess.Y);
 			if (trophy.active)
 				DrawSurface(screen, trophyPNG, trophy.X, trophy.Y);
+
 			for (int i = 0; i < 3; ++i) {
 				if (heart.isActive[i]) {
 					DrawSurface(screen, heartPNG, heart.X[i], heart.Y[i]);
